@@ -1,4 +1,4 @@
-# dinjs
+# dinJS
 
 `dinjs` is a JavaScript library for Nepali date arithmetic, specifically for the Bikram Sambat (BS) calendar system. It provides tools for converting dates, performing arithmetic, and calculating date differences.
 
