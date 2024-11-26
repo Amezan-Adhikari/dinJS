@@ -4,6 +4,14 @@
 
 ---
 
+## Installation
+
+Install `dinjs` using npm:
+
+```bash
+npm install dinjs
+```
+
 ## Key Methods and Examples
 
 ### 1. **Creating an Instance**
