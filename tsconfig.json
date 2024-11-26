@@ -1,17 +1,11 @@
 {
     "compilerOptions": {
-        "strict": true,
-        "noImplicitAny": true,
-        "esModuleInterop": true,
-        "strictNullChecks": true,
-        "target": "ES2022",
-        "moduleResolution": "Node10",
-        "module": "CommonJS",
-        "declaration": true,
-        "isolatedModules": true,
-        "noEmit": true,
-        "outDir": "dist"
+      "target": "es6",
+      "module": "commonjs",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true
     },
-    "include": ["lib"],
-    "exclude": ["node_modules"]
-}
+    "include": ["./lib/**/*"]
+  }
