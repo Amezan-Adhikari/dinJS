@@ -4,7 +4,7 @@ import dinjs_GET_MONTH_DAYS from "./dinjs_GET_MONTH_DAYS";
 
 export default function dinjs_ADD_DATE_BS(Date_object:DateObj,years:number,months:number,days:number){
 
-    if(years){
+    if(years<0){
         Date_object.YEAR -= Math.abs(years);
         if(Date_object.YEAR<dinjs_NEPALI_CALENDER.dinjs_CALENDER_YEAR_START){
             throw new Error(`${Date_object.YEAR} exceeds the range`);
@@ -21,6 +21,9 @@ export default function dinjs_ADD_DATE_BS(Date_object:DateObj,years:number,month
 
     Date_object.YEAR += years;
     Date_object.MONTH += months;
+
+    Date_object.YEAR += Math.floor(Date_object.MONTH/12);
+    Date_object.MONTH = 1 + Date_object.MONTH %12;
 
     //carry over the excess
     

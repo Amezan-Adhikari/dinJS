@@ -79,6 +79,7 @@ export class dinjs{
     }
     addMonths(Months:number){
         this.addDate(0,Months,0);
+        
     }
     addYears(Years:number){
         this.addDate(Years,0,0);
