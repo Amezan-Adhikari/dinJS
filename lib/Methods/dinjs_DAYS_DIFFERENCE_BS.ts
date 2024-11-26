@@ -1,6 +1,7 @@
-const dinjs_GET_MONTH_DAYS = require("./dinjs_GET_MONTH_DAYS.js").module;
+import { DateObj } from "../dataTypes";
+import dinjs_GET_MONTH_DAYS from "./dinjs_GET_MONTH_DAYS";
 
-function dinjs_DAYS_DIFFERENCE_BS(Date_object,obj){
+export default function dinjs_DAYS_DIFFERENCE_BS(Date_object:DateObj,obj:DateObj){
 
 
     let isSmaller = false;
@@ -36,4 +37,3 @@ function dinjs_DAYS_DIFFERENCE_BS(Date_object,obj){
     return days;
 
 }
-exports.module = dinjs_DAYS_DIFFERENCE_BS;

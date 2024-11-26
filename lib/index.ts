@@ -1,12 +1,13 @@
-const dinjs_CONVERT_TO_BS = require("./Methods/dinjs_CONVERT_AD_TO_BS.js").module;
-const dinjs_PARSE_DATE = require("./Methods/dinjs_PARSE_DATE.js").module;
-const dinjs_STRINGIFY_DATE = require("./Methods/dinjs_STRINGIFY_DATE.js").module;
-const dinjs_ADD_DATE_BS = require("./Methods/dinjs_ADD_DATE_BS.js").module;
-const dinjs_SUB_DATE_BS = require("./Methods/dinjs_SUB_DATE_BS.js").module;
-const dinjs_SUB_DAYS_BS = require("./Methods/dinjs_SUB_DAYS_BS.js").module;
-const dinjs_DAYS_DIFFERENCE_BS = require("./Methods/dinjs_DAYS_DIFFERENCE_BS.js").module;
+import { DateObj } from "./dataTypes";
+import dinjs_ADD_DATE_BS from "./Methods/dinjs_ADD_DATE_BS";
+import dinjs_CONVERT_TO_BS from "./Methods/dinjs_CONVERT_AD_TO_BS";
+import dinjs_DAYS_DIFFERENCE_BS from "./Methods/dinjs_DAYS_DIFFERENCE_BS";
+import dinjs_PARSE_DATE from "./Methods/dinjs_PARSE_DATE";
+import dinjs_STRINGIFY_DATE from "./Methods/dinjs_STRINGIFY_DATE";
+import dinjs_SUB_DAYS_BS from "./Methods/dinjs_SUB_DAYS_BS";
 
-class dinjs{
+
+export default class dinjs{
     dateInBS;
     DATE_FORMAT_STRING;
     DATE_OBJECT;
@@ -45,7 +46,7 @@ class dinjs{
     }
 
   
-    addDate(Years,Months,Days){
+    addDate(Years:number,Months:number,Days:number){
         try{
 
             this.DATE_OBJECT = dinjs_ADD_DATE_BS(this.DATE_OBJECT,Years,Months,Days);
@@ -57,30 +58,19 @@ class dinjs{
         
     }
 
-    daysDifference(dinjs_DATE){
-        try{
-            if(!dinjs_DATE instanceof dinjs){
-                throw "error: argument not of type dinjs"
-            }
-    
+    daysDifference(dinjs_DATE:dinjs){
             return dinjs_DAYS_DIFFERENCE_BS(this.DATE_OBJECT,dinjs_DATE.DATE_OBJECT);
-        }catch(e){
-            console.log(e);
-        }
     }
     
-    subtractDays(Days){
+    subtractDays(Days:number){
         this.DATE_OBJECT = dinjs_SUB_DAYS_BS(this.DATE_OBJECT,Days);
         this.#update();
     }
 
-    addDays(Days){
+    addDays(Days:number){
         this.addDate(0,0,Days);
     }
-
 }
-
-exports.dinjs = dinjs;
 
 
 

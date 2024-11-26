@@ -567,4 +567,4 @@ const dinjs_NEPALI_CALENDER = {
     ]
 }
 
-exports.module = dinjs_NEPALI_CALENDER;
+export { dinjs_NEPALI_CALENDER };

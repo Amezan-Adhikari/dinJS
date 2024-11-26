@@ -1,4 +1,4 @@
-function dinjs_FORMAT_DATE(DateFormat, year, month, date) {
+export default function dinjs_FORMAT_DATE(DateFormat:string, year:number, month:number, date:number) {
     DateFormat = DateFormat.toUpperCase(); // Ensure uppercase format
   
     // Validate format
@@ -18,6 +18,4 @@ function dinjs_FORMAT_DATE(DateFormat, year, month, date) {
   
     return DateFormat;
   }
-  
-  module.exports = { module: dinjs_FORMAT_DATE };
   

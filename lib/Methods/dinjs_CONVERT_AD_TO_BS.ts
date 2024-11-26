@@ -1,9 +1,9 @@
-const dinjs_NEPALI_CALENDER = require("../data/nepaliCalenderData.js").module;
-const dinjs_FORMAT_DATE = require("./dinjs_FORMAT_DATE.js").module;
-const dinjs_GET_MONTH_DAYS = require("./dinjs_GET_MONTH_DAYS.js").module;
+import { dinjs_NEPALI_CALENDER } from "../data/nepaliCalenderData";
+import dinjs_FORMAT_DATE from "./dinjs_FORMAT_DATE";
+import dinjs_GET_MONTH_DAYS from "./dinjs_GET_MONTH_DAYS";
 
 //year month and date must be in same order, the date will be returned in the format specified by the 1st parameter
-function dinjs_CONVERT_TO_BS(dinjs_Format, dinjs_YEAR, dinjs_MONTH, dinjs_DATE) {
+export default function dinjs_CONVERT_TO_BS(dinjs_Format:string, dinjs_YEAR:number, dinjs_MONTH:number, dinjs_DATE:number) {
   // Reference date (Nepali Baisakh 1)
   const dinjs_REFRENCE_DATE = new Date(
     dinjs_NEPALI_CALENDER.dinjs_REFRENCEDATE_BAISAKH_1_YEAR_START
@@ -50,5 +50,3 @@ function dinjs_CONVERT_TO_BS(dinjs_Format, dinjs_YEAR, dinjs_MONTH, dinjs_DATE) 
     dinjs_NEPALI_DATE
   );
 }
-
-module.exports = { module: dinjs_CONVERT_TO_BS };

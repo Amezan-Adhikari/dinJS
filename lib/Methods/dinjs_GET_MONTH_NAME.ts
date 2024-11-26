@@ -1,5 +1,5 @@
-function dinjs_GET_MONTH_NAME(month) {
-    const months = {
+export default function dinjs_GET_MONTH_NAME(month:number) {
+    const months: Record<number, string> = {
       1: "वैशाख",
       2: "जेठ",
       3: "असार",
@@ -15,5 +15,3 @@ function dinjs_GET_MONTH_NAME(month) {
     };
     return months[month];
   }
-
-  exports.module = dinjs_GET_MONTH_NAME;

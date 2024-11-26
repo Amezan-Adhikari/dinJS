@@ -1,10 +1,11 @@
 {
   "name": "dinjs",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "dinJS is a robust package containing nepali date arithmetic. This allows the dev to manipulate dates in B.S. More description in documentation. ",
   "main": "./lib/index.js",
+  "module": "./lib/index.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsup"
   },
   "repository": {
     "type": "git",
@@ -18,5 +19,9 @@
     "AD to BS"
   ],
   "author": "Amezan Adhikari",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
+  }
 }

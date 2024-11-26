@@ -1,7 +1,8 @@
-const dinjs_GET_MONTH_DAYS = require("./dinjs_GET_MONTH_DAYS.js").module;
-const dinjs_NEPALI_CALENDER = require("../data/nepaliCalenderData.js").module;
+import { dinjs_NEPALI_CALENDER } from "../data/nepaliCalenderData";
+import { DateObj } from "../dataTypes";
+import dinjs_GET_MONTH_DAYS from "./dinjs_GET_MONTH_DAYS";
 
-function dinjs_ADD_DATE_BS(Date_object,years,months,days){
+export default function dinjs_ADD_DATE_BS(Date_object:DateObj,years:number,months:number,days:number){
 
   
 
@@ -33,5 +34,3 @@ function dinjs_ADD_DATE_BS(Date_object,years,months,days){
     return Date_object;
 
 }
-
-exports.module = dinjs_ADD_DATE_BS;

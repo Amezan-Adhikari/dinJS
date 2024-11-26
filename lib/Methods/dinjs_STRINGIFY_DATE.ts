@@ -1,4 +1,6 @@
-function dinjs_STRINGIFY_DATE(DATE_OBJECT,Format){
+import { DateObj } from "../dataTypes";
+
+export default function dinjs_STRINGIFY_DATE(DATE_OBJECT:DateObj,Format:string){
 
     Format = Format.replace("YYYY", `${DATE_OBJECT.YEAR}`);
     Format = Format.replace("MM", `${DATE_OBJECT.MONTH < 10 ? "0" + DATE_OBJECT.MONTH : DATE_OBJECT.MONTH }`);
@@ -7,5 +9,3 @@ function dinjs_STRINGIFY_DATE(DATE_OBJECT,Format){
     return Format;
 
 }
-
-exports.module = dinjs_STRINGIFY_DATE;

@@ -1,9 +1,7 @@
-function dinjs_PARSE_DATE(Date,Format){
-    let DATE_OBJECT = {
-        YEAR:null,
-        MONTH:null,
-        DATE:null
-    }
+import { DateObj } from "../dataTypes";
+
+export default function dinjs_PARSE_DATE(Date:string,Format:string){
+    let DATE_OBJECT:DateObj = {} as DateObj;
    
     
     DATE_OBJECT.YEAR = parseInt(Date.substring(Format.indexOf('Y'),Format.indexOf('Y')+4));
@@ -12,5 +10,3 @@ function dinjs_PARSE_DATE(Date,Format){
     
     return DATE_OBJECT;
 }
-
-exports.module = dinjs_PARSE_DATE;

@@ -1,7 +1,8 @@
-const dinjs_NEPALI_CALENDER = require("../data/nepaliCalenderData.js").module;
-const dinjs_GET_MONTH_NAME = require("./dinjs_GET_MONTH_NAME.js").module;
+import { dinjs_NEPALI_CALENDER } from "../data/nepaliCalenderData";
+import dinjs_GET_MONTH_NAME from "./dinjs_GET_MONTH_NAME";
 
-function dinjs_GET_MONTH_DAYS(year, month) {
+
+export default function dinjs_GET_MONTH_DAYS(year:number, month:number) {
     const maxYear = dinjs_NEPALI_CALENDER.dinjs_CALENDER_YEAR_START + Object.keys(dinjs_NEPALI_CALENDER.dinjs_DATA).length - 1;
 
     // Validate the year
@@ -11,9 +12,8 @@ function dinjs_GET_MONTH_DAYS(year, month) {
 
     // Get month name and year data
     const monthName = dinjs_GET_MONTH_NAME(month);
-    const yearData = dinjs_NEPALI_CALENDER.dinjs_DATA[year - dinjs_NEPALI_CALENDER.dinjs_CALENDER_YEAR_START];
+    const yearData: Record<string, number> = dinjs_NEPALI_CALENDER.dinjs_DATA[year - dinjs_NEPALI_CALENDER.dinjs_CALENDER_YEAR_START];
 
     return yearData[monthName];
 }
 
-module.exports = { module: dinjs_GET_MONTH_DAYS };

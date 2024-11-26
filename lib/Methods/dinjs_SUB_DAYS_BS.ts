@@ -1,12 +1,13 @@
-const dinjs_GET_MONTH_DAYS = require("./dinjs_GET_MONTH_DAYS.js").module;
+import {DateObj} from "../dataTypes";
+import dinjs_GET_MONTH_DAYS from "./dinjs_GET_MONTH_DAYS";
 
-function dinjs_SUB_DAYS_BS(Date_object,days){
+export default function dinjs_SUB_DAYS_BS(Date_object:DateObj,days:number){
    
    
     while(days){
         days--;
 
-        
+    
         if(Date_object.DATE==1){
             if(Date_object.MONTH==1){
                 Date_object.YEAR--;
@@ -22,6 +23,4 @@ function dinjs_SUB_DAYS_BS(Date_object,days){
 
 
     return Date_object;
-
 }
-exports.module = dinjs_SUB_DAYS_BS;
