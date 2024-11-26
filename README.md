@@ -26,6 +26,13 @@ console.log(dateFromBS.dateInBS);
 ```
 ### 1. **Adding and Subtracting Dates**
 
+| Feature          | Description                        | Example   |
+|------------------|------------------------------------|-----------|
+| `addDays`        | Adds a specified number of days   | `addDays(5)` |
+| `subtractDays`   | Subtracts a specified number of days | `subtractDays(10)` |
+| `daysDifference` | Calculates the difference in days between two dates | `daysDifference(otherDate)` |
+
+
 ```javascript
 
 // Adding years, months, and days
@@ -56,7 +63,12 @@ console.log(`Difference: ${diff} days`);
 
 ## Format String Reference
 
-#   Component	Description	        Example
-    YYYY        Year (4 digits)	    2070
-    MM	        Month (2 digits)	04
-    DD	        Day (2 digits)	    12
+| Cmponent         | Description                        | Example   |
+|------------------|------------------------------------|-----------|
+| `YYYY`        | Year 4-units  | `2060` |
+| `MM`   | Month 2-units | `08` |
+| `DD` | Day 2-units | `10` |
+
+
+`demimeters - and / can be used.`
+`Any order of YYYY,MM,DD provided will save the date in that format and hence will always work with it in the same format`
