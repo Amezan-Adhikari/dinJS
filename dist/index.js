@@ -20,7 +20,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var src_exports = {};
 __export(src_exports, {
-  default: () => dinjs
+  dinjs: () => dinjs
 });
 module.exports = __toCommonJS(src_exports);
 
@@ -625,6 +625,18 @@ function dinjs_GET_MONTH_DAYS(year, month) {
 
 // src/Methods/dinjs_ADD_DATE_BS.ts
 function dinjs_ADD_DATE_BS(Date_object, years, months, days) {
+  if (years) {
+    Date_object.YEAR -= Math.abs(years);
+    if (Date_object.YEAR < dinjs_NEPALI_CALENDER.dinjs_CALENDER_YEAR_START) {
+      throw new Error(`${Date_object.YEAR} exceeds the range`);
+    }
+    return Date_object;
+  }
+  if (months < 0) {
+    Date_object.YEAR -= Math.floor(Math.abs(months) / 12);
+    Date_object.MONTH -= Math.abs(months) % 12;
+    return Date_object;
+  }
   Date_object.YEAR += years;
   Date_object.MONTH += months;
   if (Date_object.YEAR > dinjs_NEPALI_CALENDER.dinjs_CALENDER_YEAR_START + Object.keys(dinjs_NEPALI_CALENDER.dinjs_DATA).length - 1) {
@@ -797,7 +809,23 @@ var dinjs = class {
     this.DATE_OBJECT = dinjs_SUB_DAYS_BS(this.DATE_OBJECT, Days);
     this.#update();
   }
+  subtractMonths(Months) {
+    this.addDate(0, -Months, 0);
+  }
+  subtractYears(Years) {
+    this.addDate(-Years, 0, 0);
+  }
   addDays(Days) {
     this.addDate(0, 0, Days);
   }
+  addMonths(Months) {
+    this.addDate(0, Months, 0);
+  }
+  addYears(Years) {
+    this.addDate(Years, 0, 0);
+  }
 };
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  dinjs
+});

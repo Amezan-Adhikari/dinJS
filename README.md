@@ -18,9 +18,9 @@ npm install dinjs
 
 ```javascript
 
-import  dinjs  from "dinjs"
+import  { dinjs }  from "dinjs"
 or
-const  dinjs  = require("dinjs");
+const  { dinjs }  = require("dinjs");
 
 
 // Current date in BS
@@ -41,7 +41,11 @@ console.log(dateFromBS.dateInBS);
 | Feature          | Description                        | Example   |
 |------------------|------------------------------------|-----------|
 | `addDays`        | Adds a specified number of days   | `addDays(5)` |
+| `addMonths`        | Adds a specified number of Months   | `addMonths(6)` |
+| `addYears`        | Adds a specified number of Years   | `addYears(1)` |
 | `subtractDays`   | Subtracts a specified number of days | `subtractDays(10)` |
+| `subtractMonths`   | Subtracts a specified number of days | `subtractMonths(2)` |
+| `subtractYears`   | Subtracts a specified number of days | `subtractYears(5)` |
 | `daysDifference` | Calculates the difference in days between two dates | `daysDifference(otherDate)` |
 
 
@@ -52,6 +56,12 @@ dateFromBS.addDate(1, 2, 15);
 console.log(dateFromBS.dateInBS);
 
 // Adding days
+dateFromBS.addDays(10);
+console.log(dateFromBS.dateInBS);
+
+dateFromBS.addDays(10);
+console.log(dateFromBS.dateInBS);
+
 dateFromBS.addDays(10);
 console.log(dateFromBS.dateInBS);
 

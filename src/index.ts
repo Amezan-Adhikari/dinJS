@@ -6,7 +6,7 @@ import dinjs_STRINGIFY_DATE from "./Methods/dinjs_STRINGIFY_DATE";
 import dinjs_SUB_DAYS_BS from "./Methods/dinjs_SUB_DAYS_BS";
 
 export * from "./dataTypes";
-export default class dinjs{
+export class dinjs{
     dateInBS;
     DATE_FORMAT_STRING;
     DATE_OBJECT;
@@ -66,10 +66,22 @@ export default class dinjs{
         this.#update();
     }
 
+    subtractMonths(Months:number){
+        this.addDate(0,-Months,0);
+    }
+
+    subtractYears(Years:number){
+        this.addDate(-Years,0,0);
+    }
+
     addDays(Days:number){
         this.addDate(0,0,Days);
     }
+    addMonths(Months:number){
+        this.addDate(0,Months,0);
+    }
+    addYears(Years:number){
+        this.addDate(Years,0,0);
+    }
 }
-
-
 

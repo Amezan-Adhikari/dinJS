@@ -13,7 +13,11 @@ declare class dinjs {
     addDate(Years: number, Months: number, Days: number): void;
     daysDifference(dinjs_DATE: dinjs): number;
     subtractDays(Days: number): void;
+    subtractMonths(Months: number): void;
+    subtractYears(Years: number): void;
     addDays(Days: number): void;
+    addMonths(Months: number): void;
+    addYears(Years: number): void;
 }
 
-export { type DateObj, dinjs as default };
+export { type DateObj, dinjs };
