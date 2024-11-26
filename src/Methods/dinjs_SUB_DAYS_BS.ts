@@ -13,11 +13,15 @@ export default function dinjs_SUB_DAYS_BS(Date_object:DateObj,days:number){
                 Date_object.YEAR--;
                 Date_object.MONTH = 12;
             }
-            Date_object.MONTH--;
+            else{
+                Date_object.MONTH--;
+            }
             const daysInMonth = dinjs_GET_MONTH_DAYS(Date_object.YEAR,Date_object.MONTH);
             Date_object.DATE = daysInMonth;
         }
-        Date_object.DATE--;
+        else{
+            Date_object.DATE--;
+        }
 
     }
 

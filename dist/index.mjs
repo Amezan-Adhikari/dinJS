@@ -614,7 +614,7 @@ function dinjs_ADD_DATE_BS(Date_object, years, months, days) {
   Date_object.YEAR += years;
   Date_object.MONTH += months;
   Date_object.YEAR += Math.floor(Date_object.MONTH / 12);
-  Date_object.MONTH = 1 + Date_object.MONTH % 12;
+  Date_object.MONTH = Date_object.MONTH === 12 ? 1 : Date_object.MONTH % 12;
   if (Date_object.YEAR > dinjs_NEPALI_CALENDER.dinjs_CALENDER_YEAR_START + Object.keys(dinjs_NEPALI_CALENDER.dinjs_DATA).length - 1) {
     throw new Error(`Year ${Date_object.YEAR} Extends the range`);
   }
@@ -733,12 +733,14 @@ function dinjs_SUB_DAYS_BS(Date_object, days) {
       if (Date_object.MONTH == 1) {
         Date_object.YEAR--;
         Date_object.MONTH = 12;
+      } else {
+        Date_object.MONTH--;
       }
-      Date_object.MONTH--;
       const daysInMonth = dinjs_GET_MONTH_DAYS(Date_object.YEAR, Date_object.MONTH);
       Date_object.DATE = daysInMonth;
+    } else {
+      Date_object.DATE--;
     }
-    Date_object.DATE--;
   }
   return Date_object;
 }
