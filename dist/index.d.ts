@@ -16,4 +16,4 @@ declare class dinjs {
     addDays(Days: number): void;
 }
 
-export { dinjs as default };
+export { type DateObj, dinjs as default };

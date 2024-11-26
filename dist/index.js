@@ -3,9 +3,6 @@ var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __typeError = (msg) => {
-  throw TypeError(msg);
-};
 var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
@@ -19,18 +16,15 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var __accessCheck = (obj, member, msg) => member.has(obj) || __typeError("Cannot " + msg);
-var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
-var __privateMethod = (obj, member, method) => (__accessCheck(obj, member, "access private method"), method);
 
-// lib/index.ts
-var lib_exports = {};
-__export(lib_exports, {
+// src/index.ts
+var src_exports = {};
+__export(src_exports, {
   default: () => dinjs
 });
-module.exports = __toCommonJS(lib_exports);
+module.exports = __toCommonJS(src_exports);
 
-// lib/data/nepaliCalenderData.ts
+// src/data/nepaliCalenderData.ts
 var dinjs_NEPALI_CALENDER = {
   dinjs_CALENDER_YEAR_START: 2050,
   dinjs_CALENDER_YEAR_END: 2089,
@@ -599,7 +593,7 @@ var dinjs_NEPALI_CALENDER = {
   ]
 };
 
-// lib/Methods/dinjs_GET_MONTH_NAME.ts
+// src/Methods/dinjs_GET_MONTH_NAME.ts
 function dinjs_GET_MONTH_NAME(month) {
   const months = {
     1: "\u0935\u0948\u0936\u093E\u0916",
@@ -618,7 +612,7 @@ function dinjs_GET_MONTH_NAME(month) {
   return months[month];
 }
 
-// lib/Methods/dinjs_GET_MONTH_DAYS.ts
+// src/Methods/dinjs_GET_MONTH_DAYS.ts
 function dinjs_GET_MONTH_DAYS(year, month) {
   const maxYear = dinjs_NEPALI_CALENDER.dinjs_CALENDER_YEAR_START + Object.keys(dinjs_NEPALI_CALENDER.dinjs_DATA).length - 1;
   if (year < dinjs_NEPALI_CALENDER.dinjs_CALENDER_YEAR_START || year > maxYear) {
@@ -629,7 +623,7 @@ function dinjs_GET_MONTH_DAYS(year, month) {
   return yearData[monthName];
 }
 
-// lib/Methods/dinjs_ADD_DATE_BS.ts
+// src/Methods/dinjs_ADD_DATE_BS.ts
 function dinjs_ADD_DATE_BS(Date_object, years, months, days) {
   Date_object.YEAR += years;
   Date_object.MONTH += months;
@@ -649,7 +643,7 @@ function dinjs_ADD_DATE_BS(Date_object, years, months, days) {
   return Date_object;
 }
 
-// lib/Methods/dinjs_FORMAT_DATE.ts
+// src/Methods/dinjs_FORMAT_DATE.ts
 function dinjs_FORMAT_DATE(DateFormat, year, month, date) {
   DateFormat = DateFormat.toUpperCase();
   if (!DateFormat.includes("YYYY") || !DateFormat.includes("MM") || !DateFormat.includes("DD") || DateFormat.includes("-") && DateFormat.includes("/")) {
@@ -661,7 +655,7 @@ function dinjs_FORMAT_DATE(DateFormat, year, month, date) {
   return DateFormat;
 }
 
-// lib/Methods/dinjs_CONVERT_AD_TO_BS.ts
+// src/Methods/dinjs_CONVERT_AD_TO_BS.ts
 function dinjs_CONVERT_TO_BS(dinjs_Format, dinjs_YEAR, dinjs_MONTH, dinjs_DATE) {
   const dinjs_REFRENCE_DATE = new Date(
     dinjs_NEPALI_CALENDER.dinjs_REFRENCEDATE_BAISAKH_1_YEAR_START
@@ -698,7 +692,7 @@ function dinjs_CONVERT_TO_BS(dinjs_Format, dinjs_YEAR, dinjs_MONTH, dinjs_DATE) 
   );
 }
 
-// lib/Methods/dinjs_DAYS_DIFFERENCE_BS.ts
+// src/Methods/dinjs_DAYS_DIFFERENCE_BS.ts
 function dinjs_DAYS_DIFFERENCE_BS(Date_object, obj) {
   let isSmaller = false;
   if (Date_object.YEAR < obj.YEAR || Date_object.YEAR < obj.YEAR && Date_object.MONTH < obj.MONTH || Date_object.YEAR < obj.YEAR && Date_object.MONTH < obj.MONTH && Date_object.DATE < obj.DATE) {
@@ -726,7 +720,7 @@ function dinjs_DAYS_DIFFERENCE_BS(Date_object, obj) {
   return days;
 }
 
-// lib/Methods/dinjs_PARSE_DATE.ts
+// src/Methods/dinjs_PARSE_DATE.ts
 function dinjs_PARSE_DATE(Date2, Format) {
   let DATE_OBJECT = {};
   DATE_OBJECT.YEAR = parseInt(Date2.substring(Format.indexOf("Y"), Format.indexOf("Y") + 4));
@@ -735,7 +729,7 @@ function dinjs_PARSE_DATE(Date2, Format) {
   return DATE_OBJECT;
 }
 
-// lib/Methods/dinjs_STRINGIFY_DATE.ts
+// src/Methods/dinjs_STRINGIFY_DATE.ts
 function dinjs_STRINGIFY_DATE(DATE_OBJECT, Format) {
   Format = Format.replace("YYYY", `${DATE_OBJECT.YEAR}`);
   Format = Format.replace("MM", `${DATE_OBJECT.MONTH < 10 ? "0" + DATE_OBJECT.MONTH : DATE_OBJECT.MONTH}`);
@@ -743,7 +737,7 @@ function dinjs_STRINGIFY_DATE(DATE_OBJECT, Format) {
   return Format;
 }
 
-// lib/Methods/dinjs_SUB_DAYS_BS.ts
+// src/Methods/dinjs_SUB_DAYS_BS.ts
 function dinjs_SUB_DAYS_BS(Date_object, days) {
   while (days) {
     days--;
@@ -761,12 +755,13 @@ function dinjs_SUB_DAYS_BS(Date_object, days) {
   return Date_object;
 }
 
-// lib/index.ts
-var _dinjs_instances, update_fn;
+// src/index.ts
 var dinjs = class {
+  dateInBS;
+  DATE_FORMAT_STRING;
+  DATE_OBJECT;
   //default constructor for getting current date call using new dinjs
   constructor(DATE, FORMAT_STRING = "YYYY-MM-DD", isInBS = false) {
-    __privateAdd(this, _dinjs_instances);
     this.DATE_FORMAT_STRING = FORMAT_STRING.toUpperCase();
     if (!DATE) {
       const dinjs_TODAYS_DATE = /* @__PURE__ */ new Date();
@@ -784,10 +779,13 @@ var dinjs = class {
     }
     this.DATE_OBJECT = dinjs_PARSE_DATE(this.dateInBS, this.DATE_FORMAT_STRING);
   }
+  #update() {
+    this.dateInBS = dinjs_STRINGIFY_DATE(this.DATE_OBJECT, this.DATE_FORMAT_STRING);
+  }
   addDate(Years, Months, Days) {
     try {
       this.DATE_OBJECT = dinjs_ADD_DATE_BS(this.DATE_OBJECT, Years, Months, Days);
-      __privateMethod(this, _dinjs_instances, update_fn).call(this);
+      this.#update();
     } catch (e) {
       console.log(e);
     }
@@ -797,13 +795,9 @@ var dinjs = class {
   }
   subtractDays(Days) {
     this.DATE_OBJECT = dinjs_SUB_DAYS_BS(this.DATE_OBJECT, Days);
-    __privateMethod(this, _dinjs_instances, update_fn).call(this);
+    this.#update();
   }
   addDays(Days) {
     this.addDate(0, 0, Days);
   }
-};
-_dinjs_instances = new WeakSet();
-update_fn = function() {
-  this.dateInBS = dinjs_STRINGIFY_DATE(this.DATE_OBJECT, this.DATE_FORMAT_STRING);
 };
