@@ -13,7 +13,7 @@ export default class dinjs{
     DATE_OBJECT;
 
     //default constructor for getting current date call using new dinjs
-    constructor(DATE=null,FORMAT_STRING="YYYY-MM-DD",isInBS = false){
+    constructor(DATE?:string,FORMAT_STRING:string="YYYY-MM-DD",isInBS:boolean = false){
             this.DATE_FORMAT_STRING = FORMAT_STRING.toUpperCase();
             
         if(!DATE){
