@@ -18,9 +18,9 @@ npm install dinjs
 
 ```javascript
 
-import { dinjs } from "dinjs"
+import  dinjs  from "dinjs"
 or
-const { dinjs } = require("dinjs");
+const  dinjs  = require("dinjs");
 
 
 // Current date in BS
