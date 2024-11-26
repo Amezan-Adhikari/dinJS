@@ -4,6 +4,7 @@
   "description": "dinJS is a robust package containing nepali date arithmetic. This allows the dev to manipulate dates in B.S. More description in documentation. ",
   "main": "./lib/index.js",
   "module": "./lib/index.mjs",
+   "types": "dinjs.d.ts",
   "scripts": {
     "build": "tsup"
   },
