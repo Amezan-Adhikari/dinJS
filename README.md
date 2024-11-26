@@ -17,7 +17,11 @@ npm install dinjs
 ### 1. **Creating an Instance**
 
 ```javascript
-const dinjs = require('dinjs');
+
+import { dinjs } from "dinjs"
+or
+const { dinjs } = require("dinjs");
+
 
 // Current date in BS
 const currentDate = new dinjs();
