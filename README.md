@@ -12,6 +12,10 @@ Install `dinjs` using npm:
 npm install dinjs
 ```
 
+## Range : 2000 BS - 2089 BS
+
+---
+
 ## Key Methods and Examples
 
 ### 1. **Creating an Instance**
@@ -44,8 +48,8 @@ console.log(dateFromBS.dateInBS);
 | `addMonths`        | Adds a specified number of Months   | `addMonths(6)` |
 | `addYears`        | Adds a specified number of Years   | `addYears(1)` |
 | `subtractDays`   | Subtracts a specified number of days | `subtractDays(10)` |
-| `subtractMonths`   | Subtracts a specified number of days | `subtractMonths(2)` |
-| `subtractYears`   | Subtracts a specified number of days | `subtractYears(5)` |
+| `subtractMonths`   | Subtracts a specified number of months | `subtractMonths(2)` |
+| `subtractYears`   | Subtracts a specified number of years | `subtractYears(5)` |
 | `daysDifference` | Calculates the difference in days between two dates | `daysDifference(otherDate)` |
 
 
@@ -59,14 +63,20 @@ console.log(dateFromBS.dateInBS);
 dateFromBS.addDays(10);
 console.log(dateFromBS.dateInBS);
 
-dateFromBS.addDays(10);
+dateFromBS.addMonths(2);
 console.log(dateFromBS.dateInBS);
 
-dateFromBS.addDays(10);
+dateFromBS.addYears(1);
 console.log(dateFromBS.dateInBS);
 
 // Subtracting days
 dateFromBS.subtractDays(5);
+console.log(dateFromBS.dateInBS);
+
+dateFromBS.subtractMonths(3);
+console.log(dateFromBS.dateInBS);
+
+dateFromBS.subtractYears(1);
 console.log(dateFromBS.dateInBS);
 
 
