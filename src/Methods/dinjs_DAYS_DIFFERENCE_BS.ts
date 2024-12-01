@@ -34,6 +34,6 @@ export default function dinjs_DAYS_DIFFERENCE_BS(Date_object:DateObj,obj:DateObj
         }
         
     }
-    return days;
+    return isSmaller? -days : days;
 
 }
