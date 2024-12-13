@@ -1347,11 +1347,11 @@ function dinjs_ADD_DATE_BS(Date_object, years, months, days) {
   const daysInMonth = dinjs_GET_MONTH_DAYS(Date_object.YEAR, Date_object.MONTH);
   Date_object.DATE += days;
   Date_object.MONTH += Math.floor(Date_object.DATE / daysInMonth);
-  if (Date_object.DATE >= daysInMonth) {
+  if (Date_object.DATE > daysInMonth) {
     Date_object.DATE = 1 + Date_object.DATE % daysInMonth;
   }
   Date_object.YEAR += Math.floor(Date_object.MONTH / 12);
-  if (Date_object.MONTH >= 12) {
+  if (Date_object.MONTH > 12) {
     Date_object.MONTH = 1 + Date_object.MONTH % 12;
   }
   return Date_object;
@@ -1431,7 +1431,7 @@ function dinjs_DAYS_DIFFERENCE_BS(Date_object, obj) {
       }
     }
   }
-  return days;
+  return isSmaller ? -days : days;
 }
 
 // src/Methods/dinjs_PARSE_DATE.ts

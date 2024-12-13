@@ -37,13 +37,13 @@ export default function dinjs_ADD_DATE_BS(Date_object:DateObj,years:number,month
     Date_object.DATE += days;
     Date_object.MONTH += Math.floor(Date_object.DATE/daysInMonth);
 
-    if(Date_object.DATE >= daysInMonth){
+    if(Date_object.DATE > daysInMonth){
         Date_object.DATE = 1 + Date_object.DATE %daysInMonth;
     }
 
 
     Date_object.YEAR += Math.floor(Date_object.MONTH/12);
-    if(Date_object.MONTH>=12){
+    if(Date_object.MONTH>12){
         Date_object.MONTH = 1 + Date_object.MONTH %12;
     }
     
