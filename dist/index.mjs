@@ -1307,26 +1307,43 @@ function dinjs_ADD_DATE_BS(Date_object, years, months, days) {
     return Date_object;
   }
   if (months < 0) {
-    Date_object.YEAR -= Math.floor(Math.abs(months) / 12);
-    Date_object.MONTH -= Math.abs(months) % 12;
+    months = Math.abs(months);
+    if (Date_object.MONTH > months) {
+      Date_object.MONTH = Date_object.MONTH - months;
+      return Date_object;
+    } else if (Date_object.MONTH <= months) {
+      while (months) {
+        months--;
+        if (Date_object.MONTH == 1) {
+          Date_object.MONTH = 12;
+          Date_object.YEAR--;
+        } else {
+          Date_object.MONTH--;
+        }
+      }
+    }
     return Date_object;
   }
   Date_object.YEAR += years;
   Date_object.MONTH += months;
-  Date_object.YEAR += Math.floor(Date_object.MONTH / 12);
-  Date_object.MONTH = Date_object.MONTH === 12 ? 1 : Date_object.MONTH % 12;
+  Date_object.YEAR += Math.floor(Date_object.MONTH / 13);
+  Date_object.MONTH = Date_object.MONTH % 13 == 0 ? 1 : Date_object.MONTH % 13;
   if (Date_object.YEAR > dinjs_NEPALI_CALENDER.dinjs_CALENDER_YEAR_START + Object.keys(dinjs_NEPALI_CALENDER.dinjs_DATA).length - 1) {
     throw new Error(`Year ${Date_object.YEAR} Extends the range`);
   }
-  const daysInMonth = dinjs_GET_MONTH_DAYS(Date_object.YEAR, Date_object.MONTH);
-  Date_object.DATE += days;
-  Date_object.MONTH += Math.floor(Date_object.DATE / daysInMonth);
-  if (Date_object.DATE > daysInMonth) {
-    Date_object.DATE = 1 + Date_object.DATE % daysInMonth;
-  }
-  Date_object.YEAR += Math.floor(Date_object.MONTH / 12);
-  if (Date_object.MONTH > 12) {
-    Date_object.MONTH = 1 + Date_object.MONTH % 12;
+  while (days) {
+    days--;
+    const daysInMonth = dinjs_GET_MONTH_DAYS(Date_object.YEAR, Date_object.MONTH);
+    if (Date_object.DATE == daysInMonth + 1) {
+      Date_object.DATE = 1;
+      Date_object.MONTH++;
+      if (Date_object.MONTH > 12) {
+        Date_object.MONTH = 1;
+        Date_object.YEAR++;
+      }
+    } else {
+      Date_object.DATE++;
+    }
   }
   return Date_object;
 }
@@ -1383,7 +1400,7 @@ function dinjs_CONVERT_TO_BS(dinjs_Format, dinjs_YEAR, dinjs_MONTH, dinjs_DATE) 
 // src/Methods/dinjs_DAYS_DIFFERENCE_BS.ts
 function dinjs_DAYS_DIFFERENCE_BS(Date_object, obj) {
   let isSmaller = false;
-  if (Date_object.YEAR < obj.YEAR || Date_object.YEAR < obj.YEAR && Date_object.MONTH < obj.MONTH || Date_object.YEAR < obj.YEAR && Date_object.MONTH < obj.MONTH && Date_object.DATE < obj.DATE) {
+  if (Date_object.YEAR < obj.YEAR || Date_object.YEAR <= obj.YEAR && Date_object.MONTH < obj.MONTH || Date_object.YEAR <= obj.YEAR && Date_object.MONTH <= obj.MONTH && Date_object.DATE < obj.DATE) {
     isSmaller = true;
   }
   if (isSmaller) {
@@ -1393,8 +1410,6 @@ function dinjs_DAYS_DIFFERENCE_BS(Date_object, obj) {
   }
   let days = 0;
   while (!(Date_object.YEAR == obj.YEAR && Date_object.MONTH == obj.MONTH && Date_object.DATE == obj.DATE)) {
-    obj.DATE++;
-    days++;
     const daysInMonth = dinjs_GET_MONTH_DAYS(obj.YEAR, obj.MONTH);
     if (obj.DATE > daysInMonth) {
       obj.DATE = 1;
@@ -1403,6 +1418,9 @@ function dinjs_DAYS_DIFFERENCE_BS(Date_object, obj) {
         obj.MONTH = 1;
         obj.YEAR++;
       }
+    } else {
+      days++;
+      obj.DATE++;
     }
   }
   return isSmaller ? -days : days;
