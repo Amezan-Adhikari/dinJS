@@ -1358,9 +1358,8 @@ function dinjs_ADD_DATE_BS(Date_object, years, months, days) {
     throw new Error(`Year ${Date_object.YEAR} Extends the range`);
   }
   while (days) {
-    days--;
     const daysInMonth = dinjs_GET_MONTH_DAYS(Date_object.YEAR, Date_object.MONTH);
-    if (Date_object.DATE == daysInMonth + 1) {
+    if (Date_object.DATE > daysInMonth) {
       Date_object.DATE = 1;
       Date_object.MONTH++;
       if (Date_object.MONTH > 12) {
@@ -1369,6 +1368,7 @@ function dinjs_ADD_DATE_BS(Date_object, years, months, days) {
       }
     } else {
       Date_object.DATE++;
+      days--;
     }
   }
   return Date_object;

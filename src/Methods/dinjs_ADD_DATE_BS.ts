@@ -51,9 +51,9 @@ export default function dinjs_ADD_DATE_BS(Date_object:DateObj,years:number,month
 
 
     while(days){
-        days--;
+        
         const daysInMonth = dinjs_GET_MONTH_DAYS(Date_object.YEAR,Date_object.MONTH);
-        if(Date_object.DATE == daysInMonth+1){
+        if(Date_object.DATE > daysInMonth){
             Date_object.DATE = 1;
             Date_object.MONTH ++;
 
@@ -65,6 +65,7 @@ export default function dinjs_ADD_DATE_BS(Date_object:DateObj,years:number,month
         }
         else{
             Date_object.DATE ++;
+            days--;
         }
     }
     
