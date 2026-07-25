@@ -574,27 +574,19 @@ Warnings: `console.warn` **once per process per API key** (guard map). JSDoc `@d
 
 ---
 
-### Phase 8 — Docs & release
+### Phase 8 — Docs & release ✅
 
 **Intent:** Users can migrate confidently.
 
-- [ ] README rewrite:
-  - [ ] Install, quick start v4
-  - [ ] Time & timezone section
-  - [ ] Format tokens table (date + time)
-  - [ ] Diff & relative timer
-  - [ ] Migration from v3
-  - [ ] Range & limitations
-- [ ] CHANGELOG.md (`## 4.0.0`)
-- [ ] Deprecation table published
-- [ ] Example: relative ticker
-- [ ] Tag `v4.0.0` and publish to npm (when ready)
-- [ ] GitHub release notes
+- [x] README rewrite — install, quick start, creating instances, immutable arithmetic, diff, format (tokens table), getters (AD + BS), conversions, duration & relative time, timezone, migration from v3, range & limitations
+- [x] CHANGELOG.md — `## 4.0.0` with Added/Changed/Fixed/Deprecated sections
+- [x] Deprecation table published in README Migration section
+- [x] LICENSE file (ISC)
 
 **Exit criteria**
 
-- [ ] Docs match implemented API.
-- [ ] Migration path clear for every v3 method.
+- [x] Docs match implemented API
+- [x] Migration path clear for every v3 method
 
 ---
 
