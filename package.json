@@ -8,12 +8,14 @@
     "dist"
   ],
   "types": "./dist/index.d.ts",
+  "sideEffects": false,
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "bench": "node scripts/bench-all.js"
   },
   "repository": {
     "type": "git",

@@ -5,6 +5,7 @@ import { getMonthNameNe, getMonthNameEn } from "./core/month-names";
 import { BS_YEAR_START, BS_YEAR_COUNT, MONTHS_IN_YEAR, DAYS_IN_MONTH } from "./core/calendar-data";
 import { Duration } from "./duration/duration";
 import { watchRelative as _watchRelative } from "./duration/relative";
+import { LRUCache } from "./core/cache";
 
 // ── Types ───────────────────────────────────────────────────────
 
@@ -64,6 +65,9 @@ function isValidBsParts(year: number, month: number, day: number): boolean {
 }
 
 // ── DinDate class ───────────────────────────────────────────────
+
+/** LRU cache for format results: key = "utcMs|pattern", value = formatted string */
+const _formatCache = new LRUCache<string, string>(256);
 
 export class DinDate {
   readonly #utcMs: number;
@@ -345,6 +349,10 @@ export class DinDate {
   // ── Format ────────────────────────────────────────────────────
 
   format(pattern: string): string {
+    const cacheKey = `${this.#utcMs}|${pattern}`;
+    const cached = _formatCache.get(cacheKey);
+    if (cached !== undefined) return cached;
+
     const nepal = this._nepalParts;
     const bs = this._bsParts;
 
@@ -407,6 +415,7 @@ export class DinDate {
       }
     }
 
+    _formatCache.set(cacheKey, result);
     return result;
   }
 
@@ -569,5 +578,12 @@ export class DinDate {
     options?: { base?: DinDate | (() => DinDate); locale?: "en" | "ne" }
   ): () => void {
     return _watchRelative(this, callback, options);
+  }
+
+  // ── Cache management ──────────────────────────────────────────
+
+  /** Clear all internal caches (format LRU). Useful for tests. */
+  static clearCache(): void {
+    _formatCache.clear();
   }
 }

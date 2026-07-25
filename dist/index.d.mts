@@ -187,6 +187,8 @@ declare class DinDate {
         base?: DinDate | (() => DinDate);
         locale?: "en" | "ne";
     }): () => void;
+    /** Clear all internal caches (format LRU). Useful for tests. */
+    static clearCache(): void;
 }
 
 /**

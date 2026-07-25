@@ -631,6 +631,44 @@ function watchRelative(target, callback, options) {
   };
 }
 
+// src/core/cache.ts
+var LRUCache = class {
+  #maxSize;
+  #map;
+  constructor(maxSize) {
+    this.#maxSize = maxSize;
+    this.#map = /* @__PURE__ */ new Map();
+  }
+  get(key) {
+    const val = this.#map.get(key);
+    if (val !== void 0) {
+      this.#map.delete(key);
+      this.#map.set(key, val);
+    }
+    return val;
+  }
+  set(key, value) {
+    if (this.#map.has(key)) {
+      this.#map.delete(key);
+    } else if (this.#map.size >= this.#maxSize) {
+      const first = this.#map.keys().next().value;
+      if (first !== void 0) {
+        this.#map.delete(first);
+      }
+    }
+    this.#map.set(key, value);
+  }
+  has(key) {
+    return this.#map.has(key);
+  }
+  clear() {
+    this.#map.clear();
+  }
+  get size() {
+    return this.#map.size;
+  }
+};
+
 // src/DinDate.ts
 var MS_PER_SECOND2 = 1e3;
 var MS_PER_MINUTE2 = 60 * MS_PER_SECOND2;
@@ -639,6 +677,7 @@ var MS_PER_DAY2 = 24 * MS_PER_HOUR2;
 function isValidBsParts(year, month, day) {
   return isValidBsDate(year, month, day);
 }
+var _formatCache = new LRUCache(256);
 var DinDate = class _DinDate {
   #utcMs;
   // Lazy caches (set via Object.defineProperty or cast)
@@ -868,6 +907,9 @@ var DinDate = class _DinDate {
   }
   // ── Format ────────────────────────────────────────────────────
   format(pattern) {
+    const cacheKey = `${this.#utcMs}|${pattern}`;
+    const cached = _formatCache.get(cacheKey);
+    if (cached !== void 0) return cached;
     const nepal = this._nepalParts;
     const bs = this._bsParts;
     const adYYYY = String(nepal.year).padStart(4, "0");
@@ -923,6 +965,7 @@ var DinDate = class _DinDate {
         i++;
       }
     }
+    _formatCache.set(cacheKey, result);
     return result;
   }
   // ── Conversions ───────────────────────────────────────────────
@@ -1044,6 +1087,11 @@ var DinDate = class _DinDate {
   /** Watch this date with live-updating relative text. */
   watchRelative(callback, options) {
     return watchRelative(this, callback, options);
+  }
+  // ── Cache management ──────────────────────────────────────────
+  /** Clear all internal caches (format LRU). Useful for tests. */
+  static clearCache() {
+    _formatCache.clear();
   }
 };
 
