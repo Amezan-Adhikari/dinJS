@@ -1,10 +1,8 @@
 # dinJS
 
-Nepali date arithmetic for the Bikram Sambat (BS) calendar system.
+Nepali date library for JavaScript. Convert dates, do date math, and work with the Bikram Sambat (BS) calendar — all in Nepal time.
 
-Converts dates, performs arithmetic, and calculates differences — with full time support, Nepal timezone, and immutable API.
-
-**BS 2000–2089** | **O(1) math** | **Immutable** | **TypeScript**
+**BS 2000–2089** · **Full time support** · **TypeScript**
 
 ---
 
@@ -17,91 +15,82 @@ npm install dinjs
 ## Quick Start
 
 ```ts
-import { dinjs, DinDate } from "dinjs";
+import { dinjs } from "dinjs";
 
-// Current date in BS
-const now = dinjs();
-console.log(now.bs());        // { year: 2082, month: 4, day: 9, ... }
-console.log(now.format("BS-YYYY-MM-DD")); // "BS-2082-04-09"
+// Get today's date in Bikram Sambat
+const today = dinjs();
+console.log(today.format("BS-YYYY-MM-DD")); // "BS-2082-04-09"
 
-// From BS date
-const dashain = DinDate.from({ year: 2082, month: 7, day: 1, calendar: "bs" });
+// Dashain 2082
+const dashain = dinjs("2082-09-15", "YYYY-MM-DD", { bs: true });
 console.log(dashain.monthName()); // "Ashwin"
 
-// From AD date
-const ad = DinDate.from({ year: 2025, month: 10, day: 20, calendar: "ad" });
-console.log(ad.bs()); // { year: 2082, month: 7, day: 3, ... }
+// When is Dashain this year in AD?
+console.log(dashain.format("YYYY-MM-DD")); // "2025-10-02"
+```
 
-// From string
+## Creating Dates
+
+```ts
+import { dinjs, DinDate } from "dinjs";
+
+// From a BS string
+dinjs("2081-08-11", "YYYY-MM-DD", { bs: true });
+
+// From an AD string
+dinjs("2025-06-15", "YYYY-MM-DD");
+
+// Now (Nepal time)
+dinjs();
+
+// From a Date object
+dinjs(new Date());
+
+// From components
+DinDate.from({ year: 2082, month: 7, day: 1, calendar: "bs" });
+DinDate.from({ year: 2025, month: 9, day: 15, hour: 14, minute: 30, calendar: "ad" });
+```
+
+## Date Math
+
+```ts
 const d = dinjs("2081-08-11", "YYYY-MM-DD", { bs: true });
-```
 
-## Creating Instances
+// Add
+d.add(5, "day");
+d.add(2, "month");
+d.add(1, "year");
+d.add({ years: 1, months: 2, days: 3 });
 
-```ts
-// Factory (recommended)
-dinjs()                                        // now, Nepal TZ
-dinjs("2081-08-11", "YYYY-MM-DD", { bs: true }) // parse BS string
-dinjs("2025-06-15", "YYYY-MM-DD")              // parse AD string
-dinjs(new Date())                               // from native Date
-dinjs(1700000000000)                            // from UTC ms
+// Subtract
+d.subtract(10, "day");
+d.subtract(4, "hour");
 
-// Static from
-DinDate.from({ year: 2081, month: 8, day: 11, calendar: "bs" })
-DinDate.from({ year: 2025, month: 6, day: 15, hour: 14, minute: 30, calendar: "ad" })
-```
+// Set a specific field
+d.set("month", 12);
 
-## Immutable Arithmetic
-
-All operations return a **new** `DinDate` — the original is never modified.
-
-```ts
-const d = dinjs("2081-08-11", "YYYY-MM-DD", { bs: true });
-
-// Add / subtract with unit
-d.add(1, "day")
-d.add(2, "month")
-d.add(1, "year")
-d.subtract(5, "hour")
-d.subtract(30, "minute")
-
-// Add / subtract with map
-d.add({ years: 1, months: 2, days: 3 })
-d.subtract({ hours: 4, minutes: 30 })
-
-// Set specific field (returns new instance)
-d.set("month", 12)
-d.set("hour", 22)
-```
-
-### Month/Year Clamping
-
-When adding months or years, the day is clamped to the target month's length:
-
-```ts
-// BS 2081 Shrawan (month 4) has 32 days
-const d = DinDate.from({ year: 2081, month: 4, day: 32, calendar: "bs" });
-d.add(1, "month").bsDate(); // 31 (Bhadra has 31 days — clamped from 32)
+// When subtracting months/years, the day clamps to the last day of the target month
+const last = dinjs("2081-11-30", "YYYY-MM-DD", { bs: true });
+last.subtract(1, "month").bsDate(); // 30 (Poush has 31 days, but we had 30)
 ```
 
 ## Diff
 
 ```ts
-const a = dinjs("2081-12-25", "YYYY-MM-DD", { bs: true });
+const a = dinjs("2082-04-15", "YYYY-MM-DD", { bs: true });
 const b = dinjs("2081-08-11", "YYYY-MM-DD", { bs: true });
 
-// Full diff result
-const diff = a.diff(b);
+// Full breakdown
+a.diff(b);
 // { years: 0, months: 4, days: 135, hours: 0, minutes: 0, seconds: 0, milliseconds: 0 }
 
-// Diff in specific unit
-a.diff(b, "day");    // 135 (calendar dayIndex diff)
-a.diff(b, "month");  // 4
-a.diff(b, "year");   // 0
+// In a specific unit
+a.diff(b, "day");   // 135
+a.diff(b, "month"); // 4
 
-// Diff from now
-a.diffNow();          // Duration
-a.diffNow("day");     // number
+// From now
+a.diffNow();        // Duration
+a.diffNow("day");   // number
 ```
 
 ## Format
@@ -110,18 +99,14 @@ a.diffNow("day");     // number
 const d = dinjs("2081-08-11 14:30:45", "YYYY-MM-DD HH:mm:ss", { bs: true });
 
 d.format("YYYY-MM-DD");              // "2081-08-11"
-d.format("BS-YYYY-MM-DD");           // "BS-2081-08-11"
 d.format("DD/MM/YYYY");              // "11/08/2081"
 d.format("HH:mm:ss");                // "14:30:45"
-d.format("HH:mm:ss.SSS");            // "14:30:45.000"
 d.format("[Today is] YYYY-MM-DD");    // "Today is 2081-08-11"
 ```
 
-### Format Tokens
-
 | Token | Description | Example |
 |-------|-------------|---------|
-| `YYYY` | 4-digit year | `2081` |
+| `YYYY` | Year | `2081` |
 | `YY` | 2-digit year | `81` |
 | `MM` | Month (01–12) | `08` |
 | `DD` | Day (01–32) | `11` |
@@ -130,55 +115,48 @@ d.format("[Today is] YYYY-MM-DD");    // "Today is 2081-08-11"
 | `ss` | Seconds (00–59) | `45` |
 | `SSS` | Milliseconds (000–999) | `000` |
 
-Use `[literal]` for text: `[BS-]YYYY-MM-DD` → `BS-2081-08-11`
+Wrap text in `[brackets]`: `[BS-]YYYY-MM-DD` → `BS-2081-08-11`
 
-**BS vs AD:** If the pattern contains `BS`, year/month/day tokens use BS values. Otherwise AD values.
+If the pattern contains `BS`, the date tokens use Bikram Sambat. Otherwise they use AD.
 
 ## Getters
-
-### Date-like (AD Nepal wall time)
 
 ```ts
 const d = dinjs("2081-08-11", "YYYY-MM-DD", { bs: true });
 
-d.getFullYear();   // 2024 (AD)
-d.getMonth();      // 10 (0-based, November)
-d.getDate();       // 26
-d.getDay();        // 2 (Tuesday, 0=Sun)
-d.getHours();      // 0
-d.getMinutes();    // 0
-d.getSeconds();    // 0
-d.getMilliseconds(); // 0
-```
-
-### BS Accessors
-
-```ts
+// BS fields
 d.bsYear();    // 2081
 d.bsMonth();   // 8
 d.bsDate();    // 11
-d.bsHour();    // 0
-d.bsMinute();  // 0
-d.bsSecond();  // 0
-d.bsMs();      // 0
+d.monthName(); // "Mangsir"
+d.monthName("ne"); // "मंसिर"
 
-d.monthName();     // "Mangsir" (English)
-d.monthName("ne"); // "\u092e\u0902\u0938\u093f\u0930" (Nepali)
+// AD fields (same as JavaScript Date)
+d.getFullYear(); // 2024
+d.getMonth();    // 10 (0-based, November)
+d.getDate();     // 26
+d.getDay();      // 2 (0=Sun)
 
-d.bs();    // { year: 2081, month: 8, day: 11, hour: 0, minute: 0, second: 0, ms: 0 }
-d.ad();    // { year: 2024, month: 11, day: 26, hour: 0, minute: 0, second: 0, ms: 0 }
+// Full objects
+d.bs(); // { year: 2081, month: 8, day: 11, hour: 0, minute: 0, second: 0, ms: 0 }
+d.ad(); // { year: 2024, month: 11, day: 26, hour: 0, minute: 0, second: 0, ms: 0 }
 ```
 
-## Conversions
+## Relative Time
 
 ```ts
-d.valueOf();       // UTC milliseconds
-d.toDate();        // native Date
-d.toISOString();   // "2024-11-26T00:00:00.000Z"
-d.toString();      // same as toISOString
+const d = dinjs("2025-12-25", "YYYY-MM-DD");
+
+d.fromNow(); // "in 6 months"
+
+// Live-updating display
+const stop = d.watchRelative((text, duration) => {
+  console.log(text); // "in 6 months", then "in 5 months", ...
+});
+stop(); // call when done
 ```
 
-## Duration & Relative Time
+### Duration
 
 ```ts
 import { Duration } from "dinjs";
@@ -186,69 +164,39 @@ import { Duration } from "dinjs";
 const dur = Duration.fromMs(90061001);
 dur.humanize();       // "a day"
 dur.humanizeAgo();    // "in a day"
-dur.as("hour");       // 25.0169...
-dur.refreshIntervalMs(); // 3600000 (1 hour, adaptive)
+dur.as("hour");       // 25.02
 
-// Relative strings
-const d = dinjs("2025-12-25", "YYYY-MM-DD");
-d.fromNow();  // "in 6 months"
-
-// Live-updating relative display
-const cancel = d.watchRelative((text, duration) => {
-  console.log(text); // "in 6 months", then "in 5 months", etc.
-});
-// Call cancel() to stop updates
+// Adaptive refresh for live UIs
+dur.refreshIntervalMs(); // 3600000 (1 hour)
 ```
 
-### Adaptive Refresh
+## Conversions
 
-`Duration.refreshIntervalMs()` and `Duration.nextDelay()` automatically choose the right update frequency:
+```ts
+const d = dinjs("2081-08-11", "YYYY-MM-DD", { bs: true });
 
-| Remaining | Refresh Interval |
-|-----------|-----------------|
-| < 1 min | 1 second |
-| < 2 hours | 1 minute |
-| < 6 hours | 30 minutes |
-| < 12 hours | 1 hour |
-| < 1 day | 2 hours |
-| ≥ 1 day | 1 day |
+d.valueOf();       // UTC milliseconds
+d.toDate();        // native Date object
+d.toISOString();   // "2024-11-26T00:00:00.000Z"
+```
 
 ## Timezone
 
-All civil date math uses **Nepal timezone** (`Asia/Kathmandu`, fixed UTC+05:45, no DST).
+All dates use **Nepal time** (`Asia/Kathmandu`, UTC+05:45, no DST). Your server or browser timezone doesn't affect results.
 
-```ts
-import { NEPAL_OFFSET_MS, NEPAL_TZ } from "dinjs";
-
-NEPAL_OFFSET_MS; // 20700000 (5h 45m in ms)
-NEPAL_TZ;        // "Asia/Kathmandu"
-```
-
-BS civil date = Nepal wall date of the instant. Host timezone does not affect results.
-
-## Migration from v3
+## Migrating from v3
 
 | v3 | v4 |
 |----|-----|
 | `new dinjs("2081-08-10", "YYYY-MM-DD", true)` | `dinjs("2081-08-10", "YYYY-MM-DD", { bs: true })` |
-| `d.addDays(5)` (mutates) | `d.add(5, "day")` (immutable) |
-| `d.subtractDays(10)` (mutates) | `d.subtract(10, "day")` (immutable) |
-| `d.addDate(1, 2, 3)` (mutates) | `d.add({ years: 1, months: 2, days: 3 })` |
+| `d.addDays(5)` | `d.add(5, "day")` |
+| `d.subtractDays(10)` | `d.subtract(10, "day")` |
+| `d.addDate(1, 2, 3)` | `d.add({ years: 1, months: 2, days: 3 })` |
 | `d.daysDifference(other)` | `d.diff(other, "day")` |
-| `d.dateInBS` (string) | `d.format("BS-YYYY-MM-DD")` |
-| `d.DATE_OBJECT` | `d.bs()` → `{ year, month, day, ... }` |
-| — | `d.bsYear()` / `d.bsMonth()` / `d.bsDate()` |
-| — | `d.fromNow()` → relative string |
-| — | `d.watchRelative(cb)` → live display |
+| `d.dateInBS` | `d.format("BS-YYYY-MM-DD")` |
+| `d.DATE_OBJECT` | `d.bs()` |
 
-v3 methods still work but emit deprecation warnings. They will be removed in v5.
-
-## Range & Limitations
-
-- **Supported:** BS 2000–2089 (90 years of calendar data)
-- **Time:** Full hours/minutes/seconds/milliseconds support
-- **Timezone:** Nepal (UTC+05:45) only — no DST, no other timezone conversion
-- **Immutability:** All v4 operations return new instances (no mutation)
+v3 methods still work but show deprecation warnings. They'll be removed in v5.
 
 ## License
 
