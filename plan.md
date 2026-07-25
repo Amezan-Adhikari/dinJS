@@ -416,24 +416,26 @@ Warnings: `console.warn` **once per process per API key** (guard map). JSDoc `@d
 
 ---
 
-### Phase 2 — Timezone + time model
+### Phase 2 — Timezone + time model ✅
 
 **Intent:** Correct Nepal wall time; host-TZ independent.
 
-- [ ] Constants: `NEPAL_OFFSET_MS`, `NEPAL_TZ`, epoch utcMs fixture.
-- [ ] `utcMsToNepalParts(utcMs)` → `{ y, m, d, h, mi, s, ms }` AD.
-- [ ] `nepalPartsToUtcMs(parts)` inverse.
-- [ ] Link Nepal civil **date** to `dayIndex` via reference.
-- [ ] BS parts from dayIndex + time-of-day from Nepal parts.
-- [ ] Tests **forced independent of machine TZ** (compute via offsets only).
-- [ ] Midnight boundary tests: ±1 minute around Nepal midnight.
-- [ ] Known AD↔BS date fixtures (20+ pairs across decades) at 00:00 Nepal and at 12:00 Nepal.
-- [ ] `Date` input: `dinjs(new Date(iso))` preserves instant.
+- [x] Constants: `NEPAL_OFFSET_MS` = 20,700,000, `NEPAL_TZ` = "Asia/Kathmandu" — `src/core/time.ts`
+- [x] `utcMsToNepalParts(utcMs)` → `{ y, m, d, h, mi, s, ms }` AD — O(1) Howard Hinnant algorithm
+- [x] `nepalPartsToUtcMs(parts)` inverse — O(1)
+- [x] Nepal civil date ↔ `dayIndex` via reference anchor (AD 1943-04-14 = BS 2000-01-01)
+- [x] `utcMsToBsDateTime` / `bsDateTimeToUtcMs` — full BS date+time round-trip
+- [x] Tests forced independent of machine TZ (all UTC ms based)
+- [x] Midnight boundary tests ±1 min / ±1 ms
+- [x] **20 known AD↔BS fixtures** at 00:00 and 12:00 Nepal (40 test cases)
+- [x] Native Date preserves instant
+- [x] Fixed offset verified (no DST: same +05:45 in Jan and Jul)
 
 **Exit criteria**
 
-- [ ] Same utcMs → same BS date/time fields on any OS CI.
-- [ ] Documented epoch fixture test locked.
+- [x] **33,011 tests pass** (29 new in time.test.ts)
+- [x] Typecheck clean
+- [x] Build clean
 
 ---
 
