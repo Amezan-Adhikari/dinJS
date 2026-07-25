@@ -20,9 +20,825 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var src_exports = {};
 __export(src_exports, {
-  dinjs: () => dinjs
+  BS_YEAR_COUNT: () => BS_YEAR_COUNT,
+  BS_YEAR_END: () => BS_YEAR_END,
+  BS_YEAR_START: () => BS_YEAR_START,
+  DinDate: () => DinDate,
+  NEPAL_OFFSET_MS: () => NEPAL_OFFSET_MS,
+  NEPAL_TZ: () => NEPAL_TZ,
+  TOTAL_DAYS: () => TOTAL_DAYS,
+  dinjs: () => dinjs,
+  dinjs_v3: () => dinjs_v3,
+  getDaysInBsMonth: () => getDaysInBsMonth,
+  getMonthNameEn: () => getMonthNameEn,
+  getMonthNameNe: () => getMonthNameNe,
+  isValidBsDate: () => isValidBsDate
 });
 module.exports = __toCommonJS(src_exports);
+
+// src/core/calendar-data.ts
+var DAYS_IN_MONTH = [
+  [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+  [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+  [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+  [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+  [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+  [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+  [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+  [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 31, 32, 30, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+  [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+  [30, 32, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+  [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+  [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+  [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+  [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 31, 32, 30, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+  [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+  [31, 31, 31, 32, 31, 31, 29, 30, 29, 30, 29, 31],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+  [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+  [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+  [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+  [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30],
+  [31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
+  [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+  [31, 31, 32, 31, 31, 30, 30, 30, 29, 30, 30, 30],
+  [31, 32, 31, 32, 30, 31, 30, 30, 29, 30, 30, 30],
+  [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30],
+  [31, 31, 32, 31, 31, 31, 30, 30, 30, 30, 30, 30],
+  [30, 31, 32, 32, 30, 31, 30, 30, 29, 30, 30, 30],
+  [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30]
+];
+var BS_YEAR_START = 2e3;
+var BS_YEAR_END = 2089;
+var BS_YEAR_COUNT = 90;
+var MONTHS_IN_YEAR = 12;
+var REFERENCE_AD_YEAR = 1943;
+var REFERENCE_AD_MONTH = 4;
+var REFERENCE_AD_DAY = 14;
+
+// src/core/cumulative.ts
+var DAYS_IN_YEAR = DAYS_IN_MONTH.map(
+  (months) => months.reduce((sum, d) => sum + d, 0)
+);
+var CUM_DAYS_BEFORE_YEAR = (() => {
+  const cum = new Array(BS_YEAR_COUNT + 1);
+  cum[0] = 0;
+  for (let i = 0; i < BS_YEAR_COUNT; i++) {
+    cum[i + 1] = cum[i] + DAYS_IN_YEAR[i];
+  }
+  return cum;
+})();
+var TOTAL_DAYS = CUM_DAYS_BEFORE_YEAR[BS_YEAR_COUNT];
+var CUM_DAYS_BEFORE_MONTH = DAYS_IN_MONTH.map((months) => {
+  const cum = new Array(MONTHS_IN_YEAR + 1);
+  cum[0] = 0;
+  for (let m = 0; m < MONTHS_IN_YEAR; m++) {
+    cum[m + 1] = cum[m] + months[m];
+  }
+  return cum;
+});
+
+// src/core/day-index.ts
+function bsToDayIndex(year, month, day) {
+  if (year < BS_YEAR_START || year > BS_YEAR_START + BS_YEAR_COUNT - 1) {
+    throw new Error(
+      `Year ${year} out of range. Valid: ${BS_YEAR_START}\u2013${BS_YEAR_START + BS_YEAR_COUNT - 1}`
+    );
+  }
+  if (month < 1 || month > MONTHS_IN_YEAR) {
+    throw new Error(`Month ${month} out of range. Valid: 1\u2013${MONTHS_IN_YEAR}`);
+  }
+  const yearIndex = year - BS_YEAR_START;
+  const maxDay = DAYS_IN_MONTH[yearIndex][month - 1];
+  if (day < 1 || day > maxDay) {
+    throw new Error(
+      `Day ${day} out of range for ${year}-${month}. Max day: ${maxDay}`
+    );
+  }
+  return CUM_DAYS_BEFORE_YEAR[yearIndex] + CUM_DAYS_BEFORE_MONTH[yearIndex][month - 1] + (day - 1);
+}
+function dayIndexToBs(index) {
+  if (index < 0 || index >= TOTAL_DAYS) {
+    throw new Error(
+      `dayIndex ${index} out of range. Valid: 0\u2013${TOTAL_DAYS - 1}`
+    );
+  }
+  let lo = 0;
+  let hi = BS_YEAR_COUNT - 1;
+  while (lo < hi) {
+    const mid = lo + hi >>> 1;
+    if (CUM_DAYS_BEFORE_YEAR[mid + 1] <= index) {
+      lo = mid + 1;
+    } else {
+      hi = mid;
+    }
+  }
+  const yearIndex = lo;
+  const dayWithinYear = index - CUM_DAYS_BEFORE_YEAR[yearIndex];
+  let monthIndex = 0;
+  while (monthIndex < MONTHS_IN_YEAR - 1 && CUM_DAYS_BEFORE_MONTH[yearIndex][monthIndex + 1] <= dayWithinYear) {
+    monthIndex++;
+  }
+  const dayInMonth = dayWithinYear - CUM_DAYS_BEFORE_MONTH[yearIndex][monthIndex] + 1;
+  return {
+    year: BS_YEAR_START + yearIndex,
+    month: monthIndex + 1,
+    day: dayInMonth
+  };
+}
+function getDaysInBsMonth(year, month) {
+  if (year < BS_YEAR_START || year > BS_YEAR_START + BS_YEAR_COUNT - 1) {
+    throw new Error(`Year ${year} out of range.`);
+  }
+  if (month < 1 || month > MONTHS_IN_YEAR) {
+    throw new Error(`Month ${month} out of range.`);
+  }
+  return DAYS_IN_MONTH[year - BS_YEAR_START][month - 1];
+}
+function isValidBsDate(year, month, day) {
+  if (year < BS_YEAR_START || year > BS_YEAR_START + BS_YEAR_COUNT - 1) return false;
+  if (month < 1 || month > MONTHS_IN_YEAR) return false;
+  if (day < 1) return false;
+  return day <= DAYS_IN_MONTH[year - BS_YEAR_START][month - 1];
+}
+
+// src/core/time.ts
+var NEPAL_OFFSET_MS = (5 * 60 + 45) * 60 * 1e3;
+var NEPAL_TZ = "Asia/Kathmandu";
+var epochUtcMs = Date.UTC(REFERENCE_AD_YEAR, REFERENCE_AD_MONTH - 1, REFERENCE_AD_DAY, 0, 0, 0, 0) - NEPAL_OFFSET_MS;
+function utcMsToNepalParts(utcMs) {
+  const wallMs = utcMs + NEPAL_OFFSET_MS;
+  const daysSinceEpoch = Math.floor(wallMs / 864e5);
+  const timeOfDay = wallMs - daysSinceEpoch * 864e5;
+  const hour = Math.floor(timeOfDay / 36e5);
+  const minute = Math.floor(timeOfDay % 36e5 / 6e4);
+  const second = Math.floor(timeOfDay % 6e4 / 1e3);
+  const ms = timeOfDay % 1e3;
+  const z = daysSinceEpoch + 719468;
+  const era = Math.floor((z >= 0 ? z : z - 146096) / 146097);
+  const doe = z - era * 146097;
+  const yoe = Math.floor((doe - Math.floor(doe / 1460) + Math.floor(doe / 36524) - Math.floor(doe / 146096)) / 365);
+  const y = yoe + era * 400;
+  const doy = doe - (365 * yoe + Math.floor(yoe / 4) - Math.floor(yoe / 100));
+  const mp = Math.floor((5 * doy + 2) / 153);
+  const d = doy - Math.floor((153 * mp + 2) / 5) + 1;
+  const m = mp + (mp < 10 ? 3 : -9);
+  return {
+    year: y + (m <= 2 ? 1 : 0),
+    month: m,
+    day: d,
+    hour,
+    minute,
+    second,
+    ms
+  };
+}
+function nepalPartsToUtcMs(parts) {
+  const { year, month, day, hour = 0, minute = 0, second = 0, ms = 0 } = parts;
+  const m = month;
+  const y = year - (m <= 2 ? 1 : 0);
+  const era = Math.floor(y / 400);
+  const yoe = y - era * 400;
+  const doy = Math.floor((153 * (m + (m > 2 ? -3 : 9)) + 2) / 5) + day - 1;
+  const doe = yoe * 365 + Math.floor(yoe / 4) - Math.floor(yoe / 100) + doy;
+  const daysSinceUnixEpoch = era * 146097 + doe - 719468;
+  const wallMidnightUtcMs = daysSinceUnixEpoch * 864e5 + hour * 36e5 + minute * 6e4 + second * 1e3 + ms;
+  return wallMidnightUtcMs - NEPAL_OFFSET_MS;
+}
+function nepalDateToDayIndex(year, month, day) {
+  const m = month;
+  const y = year - (m <= 2 ? 1 : 0);
+  const era = Math.floor(y / 400);
+  const yoe = y - era * 400;
+  const doy = Math.floor((153 * (m + (m > 2 ? -3 : 9)) + 2) / 5) + day - 1;
+  const doe = yoe * 365 + Math.floor(yoe / 4) - Math.floor(yoe / 100) + doy;
+  const daysSinceUnixEpoch = era * 146097 + doe - 719468;
+  const refM = REFERENCE_AD_MONTH;
+  const refY = REFERENCE_AD_YEAR - (refM <= 2 ? 1 : 0);
+  const refEra = Math.floor(refY / 400);
+  const refYoe = refY - refEra * 400;
+  const refDoy = Math.floor((153 * (refM + (refM > 2 ? -3 : 9)) + 2) / 5) + REFERENCE_AD_DAY - 1;
+  const refDoe = refYoe * 365 + Math.floor(refYoe / 4) - Math.floor(refYoe / 100) + refDoy;
+  const refDaysSinceUnixEpoch = refEra * 146097 + refDoe - 719468;
+  return daysSinceUnixEpoch - refDaysSinceUnixEpoch;
+}
+function dayIndexToNepalDate(index) {
+  const refM = REFERENCE_AD_MONTH;
+  const refY = REFERENCE_AD_YEAR - (refM <= 2 ? 1 : 0);
+  const refEra = Math.floor(refY / 400);
+  const refYoe = refY - refEra * 400;
+  const refDoy = Math.floor((153 * (refM + (refM > 2 ? -3 : 9)) + 2) / 5) + REFERENCE_AD_DAY - 1;
+  const refDoe = refYoe * 365 + Math.floor(refYoe / 4) - Math.floor(refYoe / 100) + refDoy;
+  const refDaysSinceUnixEpoch = refEra * 146097 + refDoe - 719468;
+  const daysSinceUnixEpoch = refDaysSinceUnixEpoch + index;
+  const z = daysSinceUnixEpoch + 719468;
+  const era = Math.floor((z >= 0 ? z : z - 146096) / 146097);
+  const doe = z - era * 146097;
+  const yoe = Math.floor((doe - Math.floor(doe / 1460) + Math.floor(doe / 36524) - Math.floor(doe / 146096)) / 365);
+  const y = yoe + era * 400;
+  const doy = doe - (365 * yoe + Math.floor(yoe / 4) - Math.floor(yoe / 100));
+  const mp = Math.floor((5 * doy + 2) / 153);
+  const d = doy - Math.floor((153 * mp + 2) / 5) + 1;
+  const mo = mp + (mp < 10 ? 3 : -9);
+  return {
+    year: y + (mo <= 2 ? 1 : 0),
+    month: mo,
+    day: d
+  };
+}
+function utcMsToBsDateTime(utcMs) {
+  const nepal = utcMsToNepalParts(utcMs);
+  const dayIdx = nepalDateToDayIndex(nepal.year, nepal.month, nepal.day);
+  const bs = dayIndexToBs(dayIdx);
+  return {
+    ...bs,
+    hour: nepal.hour,
+    minute: nepal.minute,
+    second: nepal.second,
+    ms: nepal.ms
+  };
+}
+function bsDateTimeToUtcMs(year, month, day, hour = 0, minute = 0, second = 0, ms = 0) {
+  const dayIdx = bsToDayIndex(year, month, day);
+  const nepalDate = dayIndexToNepalDate(dayIdx);
+  return nepalPartsToUtcMs({
+    year: nepalDate.year,
+    month: nepalDate.month,
+    day: nepalDate.day,
+    hour,
+    minute,
+    second,
+    ms
+  });
+}
+
+// src/core/month-names.ts
+var MONTH_NAMES_NE = [
+  "\u0935\u0948\u0936\u093E\u0916",
+  // Baisakh
+  "\u091C\u0947\u0920",
+  // Jestha
+  "\u0905\u0938\u093E\u0930",
+  // Asadh
+  "\u0938\u093E\u0909\u0928",
+  // Shrawan
+  "\u092D\u0926\u094C",
+  // Bhadra
+  "\u0905\u0938\u094B\u091C",
+  // Ashwin
+  "\u0915\u093E\u0930\u094D\u0924\u093F\u0915",
+  // Kartik
+  "\u092E\u0902\u0938\u093F\u0930",
+  // Mangsir
+  "\u092A\u0941\u0937",
+  // Poush
+  "\u092E\u093E\u0918",
+  // Magh
+  "\u092B\u093E\u0917\u0941\u0928",
+  // Falgun
+  "\u091A\u0948\u0924"
+  // Chaitra
+];
+var MONTH_NAMES_EN = [
+  "Baisakh",
+  "Jestha",
+  "Asadh",
+  "Shrawan",
+  "Bhadra",
+  "Ashwin",
+  "Kartik",
+  "Mangsir",
+  "Poush",
+  "Magh",
+  "Falgun",
+  "Chaitra"
+];
+function getMonthNameNe(month) {
+  if (month < 1 || month > 12) throw new Error(`Invalid month: ${month}`);
+  return MONTH_NAMES_NE[month - 1];
+}
+function getMonthNameEn(month) {
+  if (month < 1 || month > 12) throw new Error(`Invalid month: ${month}`);
+  return MONTH_NAMES_EN[month - 1];
+}
+
+// src/DinDate.ts
+var MS_PER_SECOND = 1e3;
+var MS_PER_MINUTE = 60 * MS_PER_SECOND;
+var MS_PER_HOUR = 60 * MS_PER_MINUTE;
+var MS_PER_DAY = 24 * MS_PER_HOUR;
+function isValidBsParts(year, month, day) {
+  return isValidBsDate(year, month, day);
+}
+var DinDate = class _DinDate {
+  #utcMs;
+  // Lazy caches (set via Object.defineProperty or cast)
+  #nepalParts;
+  #bsParts;
+  #dayIndex;
+  #nepalDate;
+  constructor(input) {
+    if (input === void 0) {
+      this.#utcMs = Date.now();
+    } else if (input instanceof Date) {
+      this.#utcMs = input.getTime();
+    } else {
+      this.#utcMs = input;
+    }
+  }
+  // ── Lazy getters ──────────────────────────────────────────────
+  get _nepalParts() {
+    if (!this.#nepalParts) {
+      this.#nepalParts = utcMsToNepalParts(this.#utcMs);
+    }
+    return this.#nepalParts;
+  }
+  get _bsParts() {
+    if (!this.#bsParts) {
+      this.#bsParts = utcMsToBsDateTime(this.#utcMs);
+    }
+    return this.#bsParts;
+  }
+  get _dayIndex() {
+    if (this.#dayIndex === void 0) {
+      const nepal = this._nepalParts;
+      this.#dayIndex = nepalDateToDayIndex(nepal.year, nepal.month, nepal.day);
+    }
+    return this.#dayIndex;
+  }
+  get _nepalDate() {
+    if (!this.#nepalDate) {
+      const nepal = this._nepalParts;
+      this.#nepalDate = { year: nepal.year, month: nepal.month, day: nepal.day };
+    }
+    return this.#nepalDate;
+  }
+  // ── Factory / static ─────────────────────────────────────────
+  static from(input) {
+    const { year, month, day, hour = 0, minute = 0, second = 0, ms = 0 } = input;
+    if (input.calendar === "bs") {
+      if (!isValidBsParts(year, month, day)) {
+        throw new RangeError(`Invalid BS date: ${year}-${month}-${day}`);
+      }
+      const utcMs2 = bsDateTimeToUtcMs(year, month, day, hour, minute, second, ms);
+      return new _DinDate(utcMs2);
+    }
+    if (year < 1 || year > 9999) {
+      throw new RangeError(`Year ${year} out of range (1\u20139999)`);
+    }
+    if (month < 1 || month > 12) {
+      throw new RangeError(`Month ${month} out of range (1\u201312)`);
+    }
+    if (day < 1 || day > 31) {
+      throw new RangeError(`Day ${day} out of range (1\u201331)`);
+    }
+    const utcMs = nepalPartsToUtcMs({ year, month, day, hour, minute, second, ms });
+    return new _DinDate(utcMs);
+  }
+  add(valueOrMap, unit) {
+    if (typeof valueOrMap === "number" && unit) {
+      return this._addUnit(unit, valueOrMap);
+    }
+    if (typeof valueOrMap === "object" && valueOrMap !== null) {
+      let result = this;
+      for (const [u, v] of Object.entries(valueOrMap)) {
+        if (v !== 0) result = result._addUnit(u, v);
+      }
+      return result;
+    }
+    throw new TypeError("Invalid arguments to add()");
+  }
+  subtract(valueOrMap, unit) {
+    if (typeof valueOrMap === "number" && unit) {
+      return this._addUnit(unit, -valueOrMap);
+    }
+    if (typeof valueOrMap === "object" && valueOrMap !== null) {
+      let result = this;
+      for (const [u, v] of Object.entries(valueOrMap)) {
+        if (v !== 0) result = result._addUnit(u, -v);
+      }
+      return result;
+    }
+    throw new TypeError("Invalid arguments to subtract()");
+  }
+  _addUnit(unit, amount) {
+    const u = unit.endsWith("s") && unit !== "millisecond" ? unit.slice(0, -1) : unit;
+    if (u === "day" || u === "hour" || u === "minute" || u === "second" || u === "millisecond") {
+      const ms = u === "day" ? amount * MS_PER_DAY : u === "hour" ? amount * MS_PER_HOUR : u === "minute" ? amount * MS_PER_MINUTE : u === "second" ? amount * MS_PER_SECOND : amount;
+      return new _DinDate(this.#utcMs + ms);
+    }
+    if (u === "month" || u === "year") {
+      const bs = this._bsParts;
+      let newMonth = bs.month;
+      let newYear = bs.year;
+      if (u === "year") {
+        newYear += amount;
+      } else {
+        newMonth += amount;
+      }
+      while (newMonth > 12) {
+        newMonth -= 12;
+        newYear += 1;
+      }
+      while (newMonth < 1) {
+        newMonth += 12;
+        newYear -= 1;
+      }
+      const maxDay = getDaysInBsMonth(newYear, newMonth);
+      const newDay = Math.min(bs.day, maxDay);
+      return _DinDate.from({
+        year: newYear,
+        month: newMonth,
+        day: newDay,
+        hour: bs.hour,
+        minute: bs.minute,
+        second: bs.second,
+        ms: bs.ms,
+        calendar: "bs"
+      });
+    }
+    throw new TypeError(`Unknown unit: ${unit}`);
+  }
+  // ── Immutability: set ─────────────────────────────────────────
+  set(unit, value) {
+    const bs = this._bsParts;
+    const nepal = this._nepalParts;
+    switch (unit) {
+      case "year":
+        return _DinDate.from({ year: value, month: bs.month, day: Math.min(bs.day, getDaysInBsMonth(value, bs.month)), hour: bs.hour, minute: bs.minute, second: bs.second, ms: bs.ms, calendar: "bs" });
+      case "month": {
+        const maxDay = getDaysInBsMonth(bs.year, value);
+        return _DinDate.from({ year: bs.year, month: value, day: Math.min(bs.day, maxDay), hour: bs.hour, minute: bs.minute, second: bs.second, ms: bs.ms, calendar: "bs" });
+      }
+      case "day": {
+        const maxDay = getDaysInBsMonth(bs.year, bs.month);
+        if (value < 1 || value > maxDay) throw new RangeError(`Day ${value} out of range for BS ${bs.year}-${bs.month} (1\u2013${maxDay})`);
+        return _DinDate.from({ year: bs.year, month: bs.month, day: value, hour: bs.hour, minute: bs.minute, second: bs.second, ms: bs.ms, calendar: "bs" });
+      }
+      case "hour":
+        return new _DinDate(nepalPartsToUtcMs({ ...nepal, hour: value }));
+      case "minute":
+        return new _DinDate(nepalPartsToUtcMs({ ...nepal, minute: value }));
+      case "second":
+        return new _DinDate(nepalPartsToUtcMs({ ...nepal, second: value }));
+      case "millisecond":
+        return new _DinDate(nepalPartsToUtcMs({ ...nepal, ms: value }));
+      default:
+        throw new TypeError(`Unknown unit: ${unit}`);
+    }
+  }
+  diff(other, unit) {
+    const msDiff = this.#utcMs - other.#utcMs;
+    if (unit) {
+      switch (unit) {
+        case "millisecond":
+          return msDiff;
+        case "second":
+          return Math.trunc(msDiff / MS_PER_SECOND);
+        case "minute":
+          return Math.trunc(msDiff / MS_PER_MINUTE);
+        case "hour":
+          return Math.trunc(msDiff / MS_PER_HOUR);
+        case "day":
+          return this._dayIndex - other._dayIndex;
+        case "month": {
+          const a = this._bsParts;
+          const b = other._bsParts;
+          return (a.year - b.year) * 12 + (a.month - b.month);
+        }
+        case "year":
+          return this._bsParts.year - other._bsParts.year;
+        default: {
+          const _exhaustive = unit;
+          throw new TypeError(`Unknown unit: ${_exhaustive}`);
+        }
+      }
+    }
+    const absMs = Math.abs(msDiff);
+    const sign = msDiff < 0 ? -1 : 1;
+    const totalDays = Math.floor(absMs / MS_PER_DAY);
+    const remMs = absMs - totalDays * MS_PER_DAY;
+    const hours = Math.floor(remMs / MS_PER_HOUR);
+    const remAfterHours = remMs - hours * MS_PER_HOUR;
+    const minutes = Math.floor(remAfterHours / MS_PER_MINUTE);
+    const remAfterMinutes = remAfterHours - minutes * MS_PER_MINUTE;
+    const seconds = Math.floor(remAfterMinutes / MS_PER_SECOND);
+    const milliseconds = remAfterMinutes - seconds * MS_PER_SECOND;
+    const aBs = this._bsParts;
+    const bBs = other._bsParts;
+    let yearDiff = aBs.year - bBs.year;
+    let monthDiff = aBs.month - bBs.month;
+    if (monthDiff < 0) {
+      yearDiff -= 1;
+      monthDiff += 12;
+    }
+    const aDay = aBs.day;
+    const bDay = bBs.day;
+    let dayDiff = aDay - bDay;
+    if (dayDiff < 0) {
+      monthDiff -= 1;
+      if (monthDiff < 0) {
+        yearDiff -= 1;
+        monthDiff += 12;
+      }
+      const targetMonth = bBs.month + (aBs.month - bBs.month);
+      const normalizedMonth = (targetMonth - 1) % 12 + 1;
+      const targetYear = bBs.year + Math.floor((targetMonth - 1) / 12);
+      const maxDay = getDaysInBsMonth(targetYear, normalizedMonth);
+      dayDiff += maxDay;
+    }
+    return {
+      years: yearDiff,
+      months: monthDiff,
+      days: totalDays * sign,
+      hours: hours * sign,
+      minutes: minutes * sign,
+      seconds: seconds * sign,
+      milliseconds: milliseconds * sign
+    };
+  }
+  // ── Format ────────────────────────────────────────────────────
+  format(pattern) {
+    const nepal = this._nepalParts;
+    const bs = this._bsParts;
+    const adYYYY = String(nepal.year).padStart(4, "0");
+    const adYY = adYYYY.slice(-2);
+    const adMM = String(nepal.month).padStart(2, "0");
+    const adDD = String(nepal.day).padStart(2, "0");
+    const bsYYYY = String(bs.year).padStart(4, "0");
+    const bsYY = bsYYYY.slice(-2);
+    const bsMM = String(bs.month).padStart(2, "0");
+    const bsDD = String(bs.day).padStart(2, "0");
+    const HH = String(nepal.hour).padStart(2, "0");
+    const mm = String(nepal.minute).padStart(2, "0");
+    const ss = String(nepal.second).padStart(2, "0");
+    const SSS = String(nepal.ms).padStart(3, "0");
+    let result = "";
+    let i = 0;
+    while (i < pattern.length) {
+      if (pattern[i] === "[") {
+        const end = pattern.indexOf("]", i);
+        if (end === -1) {
+          result += pattern.slice(i + 1);
+          i = pattern.length;
+        } else {
+          result += pattern.slice(i + 1, end);
+          i = end + 1;
+        }
+      } else if (pattern.slice(i, i + 4) === "YYYY") {
+        result += pattern.includes("BS") ? bsYYYY : adYYYY;
+        i += 4;
+      } else if (pattern.slice(i, i + 2) === "YY") {
+        result += pattern.includes("BS") ? bsYY : adYY;
+        i += 2;
+      } else if (pattern.slice(i, i + 2) === "MM") {
+        result += pattern.includes("BS") ? bsMM : adMM;
+        i += 2;
+      } else if (pattern.slice(i, i + 2) === "DD") {
+        result += pattern.includes("BS") ? bsDD : adDD;
+        i += 2;
+      } else if (pattern.slice(i, i + 2) === "HH") {
+        result += HH;
+        i += 2;
+      } else if (pattern.slice(i, i + 2) === "mm") {
+        result += mm;
+        i += 2;
+      } else if (pattern.slice(i, i + 2) === "ss") {
+        result += ss;
+        i += 2;
+      } else if (pattern.slice(i, i + 3) === "SSS") {
+        result += SSS;
+        i += 3;
+      } else {
+        result += pattern[i];
+        i++;
+      }
+    }
+    return result;
+  }
+  // ── Conversions ───────────────────────────────────────────────
+  valueOf() {
+    return this.#utcMs;
+  }
+  toDate() {
+    return new Date(this.#utcMs);
+  }
+  toISOString() {
+    return this.toDate().toISOString();
+  }
+  toString() {
+    return this.toISOString();
+  }
+  toJSON() {
+    return this.toISOString();
+  }
+  // ── Date-like getters (AD wall in Nepal TZ) ───────────────────
+  getTime() {
+    return this.#utcMs;
+  }
+  getFullYear() {
+    return this._nepalParts.year;
+  }
+  getMonth() {
+    return this._nepalParts.month - 1;
+  }
+  getDate() {
+    return this._nepalParts.day;
+  }
+  getDay() {
+    const dayIdx = this._dayIndex;
+    return (dayIdx % 7 + 3) % 7;
+  }
+  getHours() {
+    return this._nepalParts.hour;
+  }
+  getMinutes() {
+    return this._nepalParts.minute;
+  }
+  getSeconds() {
+    return this._nepalParts.second;
+  }
+  getMilliseconds() {
+    return this._nepalParts.ms;
+  }
+  // ── BS accessors ──────────────────────────────────────────────
+  bsYear() {
+    return this._bsParts.year;
+  }
+  bsMonth() {
+    return this._bsParts.month;
+  }
+  bsDate() {
+    return this._bsParts.day;
+  }
+  bsHour() {
+    return this._bsParts.hour;
+  }
+  bsMinute() {
+    return this._bsParts.minute;
+  }
+  bsSecond() {
+    return this._bsParts.second;
+  }
+  bsMs() {
+    return this._bsParts.ms;
+  }
+  monthName(locale = "en") {
+    return locale === "ne" ? getMonthNameNe(this._bsParts.month) : getMonthNameEn(this._bsParts.month);
+  }
+  // ── Full decomposition ────────────────────────────────────────
+  bs() {
+    return { ...this._bsParts };
+  }
+  ad() {
+    return { ...this._nepalParts };
+  }
+  // ── Day index (for internal use / advanced) ───────────────────
+  dayIndex() {
+    return this._dayIndex;
+  }
+};
+
+// src/dinjs.ts
+function dinjs(input, format, options) {
+  if (input === void 0) {
+    return new DinDate();
+  }
+  if (input instanceof Date) {
+    return new DinDate(input);
+  }
+  if (typeof input === "number") {
+    return new DinDate(input);
+  }
+  if (typeof input === "string") {
+    return parseString(input, format || "YYYY-MM-DD", options?.bs ?? false);
+  }
+  throw new TypeError("Invalid arguments to dinjs()");
+}
+function parseString(input, format, isBs) {
+  const parts = extractParts(input, format);
+  const year = parseInt(parts.YYYY ?? parts.YY ?? "0", 10);
+  const month = parseInt(parts.MM ?? "1", 10);
+  const day = parseInt(parts.DD ?? "1", 10);
+  const hour = parseInt(parts.HH ?? "0", 10);
+  const minute = parseInt(parts.mm ?? "0", 10);
+  const second = parseInt(parts.ss ?? "0", 10);
+  const ms = parseInt(parts.SSS ?? "0", 10);
+  if (isBs) {
+    return DinDate.from({ year, month, day, hour, minute, second, ms, calendar: "bs" });
+  }
+  return DinDate.from({ year, month, day, hour, minute, second, ms, calendar: "ad" });
+}
+function extractParts(input, format) {
+  const result = {};
+  let fi = 0;
+  let ii = 0;
+  while (fi < format.length && ii < input.length) {
+    if (format[fi] === "[") {
+      const end = format.indexOf("]", fi);
+      const literal = end === -1 ? format.slice(fi + 1) : format.slice(fi + 1, end);
+      ii += literal.length;
+      fi = end === -1 ? format.length : end + 1;
+    } else if (format.slice(fi, fi + 4) === "YYYY") {
+      result.YYYY = input.slice(ii, ii + 4);
+      fi += 4;
+      ii += 4;
+    } else if (format.slice(fi, fi + 2) === "YY") {
+      result.YY = input.slice(ii, ii + 2);
+      fi += 2;
+      ii += 2;
+    } else if (format.slice(fi, fi + 2) === "MM") {
+      result.MM = input.slice(ii, ii + 2);
+      fi += 2;
+      ii += 2;
+    } else if (format.slice(fi, fi + 2) === "DD") {
+      result.DD = input.slice(ii, ii + 2);
+      fi += 2;
+      ii += 2;
+    } else if (format.slice(fi, fi + 2) === "HH") {
+      result.HH = input.slice(ii, ii + 2);
+      fi += 2;
+      ii += 2;
+    } else if (format.slice(fi, fi + 2) === "mm") {
+      result.mm = input.slice(ii, ii + 2);
+      fi += 2;
+      ii += 2;
+    } else if (format.slice(fi, fi + 2) === "ss") {
+      result.ss = input.slice(ii, ii + 2);
+      fi += 2;
+      ii += 2;
+    } else if (format.slice(fi, fi + 3) === "SSS") {
+      result.SSS = input.slice(ii, ii + 3);
+      fi += 3;
+      ii += 3;
+    } else {
+      fi++;
+      ii++;
+    }
+  }
+  return result;
+}
 
 // src/data/nepaliCalenderData.ts
 var dinjs_NEPALI_CALENDER = {
@@ -1490,22 +2306,31 @@ function dinjs_SUB_DAYS_BS(Date_object, days) {
 }
 
 // src/index.ts
-var dinjs = class {
+var dinjs_v3 = class {
   dateInBS;
   DATE_FORMAT_STRING;
   DATE_OBJECT;
-  //default constructor for getting current date call using new dinjs
   constructor(DATE, FORMAT_STRING = "YYYY-MM-DD", isInBS = false) {
     this.DATE_FORMAT_STRING = FORMAT_STRING.toUpperCase();
     if (!DATE) {
       const dinjs_TODAYS_DATE = /* @__PURE__ */ new Date();
-      let dinjs_CURRENT_YEAR = dinjs_TODAYS_DATE.getFullYear();
-      let dinjs_CURRENT_MONTH = dinjs_TODAYS_DATE.getMonth() + 1;
-      let dinjs_CURRENT_DATE = dinjs_TODAYS_DATE.getDate();
-      this.dateInBS = dinjs_CONVERT_TO_BS(this.DATE_FORMAT_STRING, dinjs_CURRENT_YEAR, dinjs_CURRENT_MONTH, dinjs_CURRENT_DATE);
+      const dinjs_CURRENT_YEAR = dinjs_TODAYS_DATE.getFullYear();
+      const dinjs_CURRENT_MONTH = dinjs_TODAYS_DATE.getMonth() + 1;
+      const dinjs_CURRENT_DATE = dinjs_TODAYS_DATE.getDate();
+      this.dateInBS = dinjs_CONVERT_TO_BS(
+        this.DATE_FORMAT_STRING,
+        dinjs_CURRENT_YEAR,
+        dinjs_CURRENT_MONTH,
+        dinjs_CURRENT_DATE
+      );
     } else if (DATE && FORMAT_STRING && !isInBS) {
-      let dinjs_DATE = dinjs_PARSE_DATE(DATE, this.DATE_FORMAT_STRING);
-      this.dateInBS = dinjs_CONVERT_TO_BS(this.DATE_FORMAT_STRING, dinjs_DATE.YEAR, dinjs_DATE.MONTH, dinjs_DATE.DATE);
+      const dinjs_DATE = dinjs_PARSE_DATE(DATE, this.DATE_FORMAT_STRING);
+      this.dateInBS = dinjs_CONVERT_TO_BS(
+        this.DATE_FORMAT_STRING,
+        dinjs_DATE.YEAR,
+        dinjs_DATE.MONTH,
+        dinjs_DATE.DATE
+      );
     } else if (DATE && FORMAT_STRING && isInBS) {
       this.dateInBS = DATE;
     } else {
@@ -1517,12 +2342,8 @@ var dinjs = class {
     this.dateInBS = dinjs_STRINGIFY_DATE(this.DATE_OBJECT, this.DATE_FORMAT_STRING);
   }
   addDate(Years, Months, Days) {
-    try {
-      this.DATE_OBJECT = dinjs_ADD_DATE_BS(this.DATE_OBJECT, Years, Months, Days);
-      this.#update();
-    } catch (e) {
-      console.log(e);
-    }
+    this.DATE_OBJECT = dinjs_ADD_DATE_BS(this.DATE_OBJECT, Years, Months, Days);
+    this.#update();
   }
   daysDifference(dinjs_DATE) {
     return dinjs_DAYS_DIFFERENCE_BS(this.DATE_OBJECT, dinjs_DATE.DATE_OBJECT);
@@ -1549,5 +2370,17 @@ var dinjs = class {
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  dinjs
+  BS_YEAR_COUNT,
+  BS_YEAR_END,
+  BS_YEAR_START,
+  DinDate,
+  NEPAL_OFFSET_MS,
+  NEPAL_TZ,
+  TOTAL_DAYS,
+  dinjs,
+  dinjs_v3,
+  getDaysInBsMonth,
+  getMonthNameEn,
+  getMonthNameNe,
+  isValidBsDate
 });

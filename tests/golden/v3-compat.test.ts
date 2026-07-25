@@ -8,7 +8,7 @@
  * Run: npm test
  */
 import { describe, it, expect } from "vitest";
-import { dinjs } from "../../src/index";
+import { dinjs_v3 as dinjs } from "../../src/index";
 
 describe("dinjs v3 constructor", () => {
   it("creates instance with default args (today in BS)", () => {

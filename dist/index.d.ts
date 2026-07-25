@@ -1,17 +1,176 @@
+/**
+ * Total days in the entire supported BS range.
+ */
+declare const TOTAL_DAYS: number;
+
+/**
+ * O(1) / O(log n) BS date ↔ dayIndex conversions.
+ *
+ * dayIndex = number of days since BS 2000-01-01 (Baisakh 1).
+ * dayIndex 0 = BS 2000-01-01.
+ */
+
+/**
+ * Result of a BS date decomposition.
+ */
+interface BsDate {
+    year: number;
+    month: number;
+    day: number;
+}
+/**
+ * Get the number of days in a given BS month.
+ * O(1).
+ */
+declare function getDaysInBsMonth(year: number, month: number): number;
+/**
+ * Check if a BS date is valid.
+ */
+declare function isValidBsDate(year: number, month: number, day: number): boolean;
+
+/**
+ * Nepal timezone utilities and AD ↔ dayIndex conversion.
+ *
+ * All civil date math uses fixed UTC+05:45 (no DST).
+ * Nepal civil date = UTC ms + NEPAL_OFFSET, truncated to date.
+ */
+
+/** Nepal timezone offset in milliseconds: +05:45 = 20,700,000 ms */
+declare const NEPAL_OFFSET_MS: number;
+/** IANA-style timezone identifier */
+declare const NEPAL_TZ = "Asia/Kathmandu";
+interface NepaliParts {
+    year: number;
+    month: number;
+    day: number;
+    hour: number;
+    minute: number;
+    second: number;
+    ms: number;
+}
+interface BsDateTime extends BsDate {
+    hour: number;
+    minute: number;
+    second: number;
+    ms: number;
+}
+
+type Unit = "year" | "month" | "day" | "hour" | "minute" | "second" | "millisecond";
+type CalendarType = "bs" | "ad";
+interface DinDateInput {
+    year: number;
+    month: number;
+    day: number;
+    hour?: number;
+    minute?: number;
+    second?: number;
+    ms?: number;
+    calendar: CalendarType;
+}
+interface DiffResult {
+    years: number;
+    months: number;
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+    milliseconds: number;
+}
+declare class DinDate {
+    #private;
+    constructor();
+    constructor(utcMs: number);
+    constructor(date: Date);
+    private get _nepalParts();
+    private get _bsParts();
+    private get _dayIndex();
+    private get _nepalDate();
+    static from(input: DinDateInput): DinDate;
+    add(value: number, unit: Unit): DinDate;
+    add(map: Partial<Record<Unit | `${Unit}s`, number>>): DinDate;
+    subtract(value: number, unit: Unit): DinDate;
+    subtract(map: Partial<Record<Unit | `${Unit}s`, number>>): DinDate;
+    private _addUnit;
+    set(unit: Unit, value: number): DinDate;
+    diff(other: DinDate): DiffResult;
+    diff(other: DinDate, unit: Unit): number;
+    format(pattern: string): string;
+    valueOf(): number;
+    toDate(): Date;
+    toISOString(): string;
+    toString(): string;
+    toJSON(): string;
+    getTime(): number;
+    getFullYear(): number;
+    getMonth(): number;
+    getDate(): number;
+    getDay(): number;
+    getHours(): number;
+    getMinutes(): number;
+    getSeconds(): number;
+    getMilliseconds(): number;
+    bsYear(): number;
+    bsMonth(): number;
+    bsDate(): number;
+    bsHour(): number;
+    bsMinute(): number;
+    bsSecond(): number;
+    bsMs(): number;
+    monthName(locale?: "ne" | "en"): string;
+    bs(): BsDateTime;
+    ad(): NepaliParts;
+    dayIndex(): number;
+}
+
+/**
+ * Factory function — recommended way to create DinDate instances.
+ *
+ * Overloads:
+ *   dinjs()                                       → now (Nepal TZ)
+ *   dinjs(date: Date)                             → from native Date
+ *   dinjs(utcMs: number)                          → from UTC ms
+ *   dinjs(bsString, format, { bs: true })         → from BS string
+ *   dinjs(adString, format)                       → from AD string
+ */
+declare function dinjs(): DinDate;
+declare function dinjs(date: Date): DinDate;
+declare function dinjs(utcMs: number): DinDate;
+declare function dinjs(input: string, format?: string, options?: {
+    bs?: boolean;
+}): DinDate;
+
+/**
+ * Map month number (1-based) to Nepali name.
+ */
+declare function getMonthNameNe(month: number): string;
+/**
+ * Map month number (1-based) to English name.
+ */
+declare function getMonthNameEn(month: number): string;
+
+declare const BS_YEAR_START = 2000;
+declare const BS_YEAR_END = 2089;
+declare const BS_YEAR_COUNT = 90;
+
 type DateObj = {
     YEAR: number;
     MONTH: number;
     DATE: number;
 };
 
-declare class dinjs {
+/** @deprecated Use `DinDate` or the `dinjs()` factory instead. */
+declare class dinjs_v3 {
     #private;
     dateInBS: string;
     DATE_FORMAT_STRING: string;
-    DATE_OBJECT: DateObj;
+    DATE_OBJECT: {
+        YEAR: number;
+        MONTH: number;
+        DATE: number;
+    };
     constructor(DATE?: string, FORMAT_STRING?: string, isInBS?: boolean);
     addDate(Years: number, Months: number, Days: number): void;
-    daysDifference(dinjs_DATE: dinjs): number;
+    daysDifference(dinjs_DATE: dinjs_v3): number;
     subtractDays(Days: number): void;
     subtractMonths(Months: number): void;
     subtractYears(Years: number): void;
@@ -20,4 +179,4 @@ declare class dinjs {
     addYears(Years: number): void;
 }
 
-export { type DateObj, dinjs };
+export { BS_YEAR_COUNT, BS_YEAR_END, BS_YEAR_START, type CalendarType, type DateObj, type DiffResult, DinDate, type DinDateInput, NEPAL_OFFSET_MS, NEPAL_TZ, TOTAL_DAYS, type Unit, dinjs, dinjs_v3, getDaysInBsMonth, getMonthNameEn, getMonthNameNe, isValidBsDate };

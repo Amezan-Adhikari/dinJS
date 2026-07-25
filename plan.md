@@ -439,29 +439,32 @@ Warnings: `console.warn` **once per process per API key** (guard map). JSDoc `@d
 
 ---
 
-### Phase 3 — `DinDate` immutable core
+### Phase 3 — `DinDate` immutable core ✅
 
 **Intent:** Main class usable end-to-end without legacy.
 
-- [ ] `DinDate` class with private `#utcMs`.
-- [ ] Constructors / static `from` / factory wiring.
-- [ ] `add(value, unit)` / `add(map)` / `subtract` → new instance.
-- [ ] Month/year add with **day clamp** to target month length (BS-aware when calendar is BS fields).
-- [ ] `set` helpers (hour, minute, date…) return new instance.
-- [ ] `diff` → `Duration` and unit overloads.
-- [ ] `format` tokens: `YYYY MM DD HH mm ss SSS` + literals; separators `- / : T space`.
-- [ ] `parse` inverse with validation (invalid date throws clear `RangeError` / `DinDateError`).
-- [ ] `toDate`, `valueOf`, `toISOString`, `toString`.
-- [ ] Date-like getters (AD Nepal wall for getHours etc. — document).
-- [ ] BS accessors + `monthName`.
-- [ ] Range checks against calendar data.
-- [ ] Immutable guarantee tests (Object freeze optional; mutation of returned plain objects cloned).
+- [x] `DinDate` class with private `#utcMs` + lazy caches (`#nepalParts`, `#bsParts`, `#dayIndex`) — `src/DinDate.ts`
+- [x] Constructors: `new DinDate()`, `new DinDate(utcMs)`, `new DinDate(date)` + static `DinDate.from()` — supports both BS and AD calendar input
+- [x] `dinjs()` factory function — `src/dinjs.ts`
+- [x] `add(value, unit)` / `add(map)` / `subtract` → new DinDate instance (immutable)
+- [x] Month/year add with **day clamp** to target BS month length
+- [x] `set` helpers (year, month, day, hour, minute, second, ms) → new instance
+- [x] `diff` → DiffResult (full) or number per unit (calendar-aware dayIndex for "day", BS field for "month"/"year")
+- [x] `format` tokens: `YYYY YY MM DD HH mm ss SSS` + `[literals]`
+- [x] `dinjs(str, format, { bs })` parse via `extractParts` (inverse of format)
+- [x] `toDate`, `valueOf`, `toISOString`, `toString`, `toJSON`
+- [x] Date-like getters: `getFullYear`, `getMonth` (0-based), `getDate`, `getDay`, `getHours/Minutes/Seconds/MS` — all Nepal wall time
+- [x] BS accessors: `bsYear`, `bsMonth`, `bsDate`, `bsHour/Minute/Second/Ms`, `monthName("ne"|"en")`
+- [x] Full decomposition: `bs()` → BsDateTime, `ad()` → NepaliParts (both return copies)
+- [x] Range checks: invalid BS dates throw `RangeError`, invalid AD years throw `RangeError`
+- [x] Immutable guarantee: all ops return new instance; original unchanged; bs()/ad() return copies
 
 **Exit criteria**
 
-- [ ] Unit tests: parse/format/add/subtract/diff/time.
-- [ ] `npm run typecheck` clean for new API.
-- [ ] No day-loops in `src/core` or `DinDate`.
+- [x] Unit tests: 88 new tests in `tests/DinDate.test.ts` (parse/format/add/subtract/set/diff/time/round-trips/immutability)
+- [x] `npm run typecheck` clean
+- [x] `npm run build` clean (CJS + ESM + DTS)
+- [x] No day-loops in `src/core` or `DinDate`
 
 ---
 
