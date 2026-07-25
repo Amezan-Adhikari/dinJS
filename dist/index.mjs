@@ -2553,11 +2553,21 @@ function dinjs_SUB_DAYS_BS(Date_object, days) {
 }
 
 // src/index.ts
+var _warned = /* @__PURE__ */ new Set();
+function _dep(name) {
+  if (!_warned.has(name)) {
+    _warned.add(name);
+    console.warn(
+      `[dinjs] ${name}() is deprecated. Use the v4 DinDate API instead. See migration guide.`
+    );
+  }
+}
 var dinjs_v3 = class {
   dateInBS;
   DATE_FORMAT_STRING;
   DATE_OBJECT;
   constructor(DATE, FORMAT_STRING = "YYYY-MM-DD", isInBS = false) {
+    _dep("new dinjs");
     this.DATE_FORMAT_STRING = FORMAT_STRING.toUpperCase();
     if (!DATE) {
       const dinjs_TODAYS_DATE = /* @__PURE__ */ new Date();
@@ -2589,29 +2599,37 @@ var dinjs_v3 = class {
     this.dateInBS = dinjs_STRINGIFY_DATE(this.DATE_OBJECT, this.DATE_FORMAT_STRING);
   }
   addDate(Years, Months, Days) {
+    _dep("addDate");
     this.DATE_OBJECT = dinjs_ADD_DATE_BS(this.DATE_OBJECT, Years, Months, Days);
     this.#update();
   }
   daysDifference(dinjs_DATE) {
+    _dep("daysDifference");
     return dinjs_DAYS_DIFFERENCE_BS(this.DATE_OBJECT, dinjs_DATE.DATE_OBJECT);
   }
   subtractDays(Days) {
+    _dep("subtractDays");
     this.DATE_OBJECT = dinjs_SUB_DAYS_BS(this.DATE_OBJECT, Days);
     this.#update();
   }
   subtractMonths(Months) {
+    _dep("subtractMonths");
     this.addDate(0, -Months, 0);
   }
   subtractYears(Years) {
+    _dep("subtractYears");
     this.addDate(-Years, 0, 0);
   }
   addDays(Days) {
+    _dep("addDays");
     this.addDate(0, 0, Days);
   }
   addMonths(Months) {
+    _dep("addMonths");
     this.addDate(0, Months, 0);
   }
   addYears(Years) {
+    _dep("addYears");
     this.addDate(Years, 0, 0);
   }
 };

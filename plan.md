@@ -497,27 +497,26 @@ Warnings: `console.warn` **once per process per API key** (guard map). JSDoc `@d
 
 ---
 
-### Phase 5 — Compatibility layer (`dinjs` v3 API)
+### Phase 5 — Compatibility layer (`dinjs` v3 API) ✅
 
 **Intent:** Existing users keep working.
 
-- [ ] `dinjs` factory function returning `DinDate`.
-- [ ] `class dinjs` **or** dual export: prefer  
-  - `function dinjs(...): DinDate`  
-  - `class DinJS` deprecated alias if `new dinjs` must remain  
-  - Support `new dinjs(...)` via constructable function pattern if required.
-- [ ] Mutating methods update internal state on wrapper **or** reassign pattern documented.
-  - Recommended: legacy class holds `{ current: DinDate }` and mutates by replacing `current`.
-- [ ] `daysDifference` uses dayIndex; sign matches v3.
-- [ ] Golden tests: README v3 snippets still pass.
-- [ ] Once-only deprecation warnings.
-- [ ] Export `DateObj` type expanded optionally with time fields (non-breaking add).
+- [x] `dinjs()` factory function returning `DinDate` — `src/dinjs.ts`
+- [x] `class dinjs_v3` with mutable methods wrapping legacy v3 logic — `src/index.ts`
+- [x] Mutating methods update internal state (same as v3 behavior)
+- [x] `daysDifference` uses dayIndex via legacy v3 method; sign matches v3
+- [x] Golden tests: 21 v3 tests still pass (`tests/golden/v3-compat.test.ts`)
+- [x] Once-only deprecation warnings via `_warned` Set + `console.warn`
+- [x] `DateObj` type exported via `export * from "./dataTypes"`
+- [x] Deprecation warning tests (`tests/golden/v3-deprecation.test.ts`)
 
 **Exit criteria**
 
-- [ ] v3 golden suite green.
-- [ ] v4 API suite green.
-- [ ] Deprecation warnings tested (spy on `console.warn`).
+- [x] v3 golden suite green (21 tests)
+- [x] v4 API suite green (33,122 tests)
+- [x] Deprecation warnings tested
+- [x] `npm run typecheck` clean
+- [x] `npm run build` clean
 
 ---
 
