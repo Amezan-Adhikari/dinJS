@@ -552,24 +552,24 @@ Warnings: `console.warn` **once per process per API key** (guard map). JSDoc `@d
 
 ---
 
-### Phase 7 — Types, build, package exports
+### Phase 7 — Types, build, package exports ✅
 
 **Intent:** Solid npm package.
 
-- [ ] Complete overloads in `.d.ts` (factory, diff, add).
-- [ ] `package.json`:
-  - [ ] `"version": "4.0.0"`
-  - [ ] `"exports"` map: import/require/types
-  - [ ] `"files": ["dist"]` (+ LICENSE/README)
-  - [ ] `"sideEffects": false` if true
-- [ ] `tsup.config.ts`: entry, cjs, esm, dts, clean, target
-- [ ] Verify `dist/index.d.ts` exports match README.
-- [ ] `npm run typecheck && npm test && npm run build`
-- [ ] `npm pack --dry-run` sanity.
+- [x] Complete overloads in `.d.ts` — factory (4 overloads), diff (2 overloads), add/subtract (2 overloads), diffNow (2 overloads)
+- [x] `package.json`:
+  - [x] `"version": "4.0.0"`
+  - [x] `"exports"` map with types for both import and require
+  - [x] `"files": ["dist", "LICENSE", "README.md"]`
+  - [x] `"sideEffects": false`
+- [x] `tsup.config.ts`: CJS + ESM + DTS + clean (already configured)
+- [x] `dist/index.d.ts` exports verified — 267 lines, all types included
+- [x] `npm run typecheck && npm test && npm run build` all clean
+- [x] `npm pack --dry-run` — 6 files, 25.4 kB packed
 
 **Exit criteria**
 
-- [ ] Clean publishable tarball contents.
+- [x] Clean publishable tarball contents (6 files, 25.4 kB)
 - [ ] Types work from a sample consumer project (optional `examples/`).
 
 ---
