@@ -468,22 +468,32 @@ Warnings: `console.warn` **once per process per API key** (guard map). JSDoc `@d
 
 ---
 
-### Phase 4 — Duration, relative time, timer
+### Phase 4 — Duration, relative time, timer ✅
 
 **Intent:** Product requirement for live updating UIs.
 
-- [ ] `Duration` class + `as(unit)`.
-- [ ] `humanize()` English first; Nepali strings optional same phase or 4b.
-- [ ] `fromNow` / `toNow` / `from` on `DinDate`.
-- [ ] `refreshIntervalMs` per policy + boundary capping.
-- [ ] `watchRelative` + cancel; tests with fake timers (`vi.useFakeTimers`).
-- [ ] Bucket boundary tests: 59s, 60s, 2h−1s, 2h, 6h, 12h, 24h, 25h, 1 day remaining transition.
-- [ ] Ensure no runaway 0ms timeout loops.
+- [x] `Duration` class with `#ms` source of truth + clock breakdown (`days`, `hours`, `minutes`, `seconds`, `millisecondsPart`) — `src/duration/duration.ts`
+- [x] `Duration.as(unit)` for unit conversion (ms/sec/min/hr/day)
+- [x] `Duration.humanize()` English + Nepali strings, `humanizeAgo()` for past/future
+- [x] `Duration.refreshIntervalMs()` adaptive policy (1s → 1m → 30m → 1h → 2h → 1d)
+- [x] `Duration.nextDelay()` with bucket boundary capping (floor 100ms)
+- [x] `Duration` arithmetic: `abs()`, `negate()`, `add()`, `subtract()`
+- [x] `Duration` comparison: `lt()`, `lte()`, `gt()`, `gte()`, `eq()`
+- [x] `Duration` factory: `fromMs()`, `fromSeconds()`, `fromMinutes()`, `fromHours()`, `fromDays()`
+- [x] `Duration` serialization: `toJSON()`, `toString()`, `valueOf()`
+- [x] `DinDate.diffNow()` / `diffNow(unit)` — returns Duration or number
+- [x] `DinDate.fromNow()` / `DinDate.from(other)` — humanized relative strings
+- [x] `DinDate.watchRelative()` — live-updating callback with cancel
+- [x] `watchRelative()` standalone helper — chained setTimeout, cancel function — `src/duration/relative.ts`
+- [x] Bucket boundary tests: 0ms, 59s, 61s, 2h+1s, 90min
+- [x] Fake-timer tests: `vi.useFakeTimers` / `vi.advanceTimersByTime`
+- [x] No runaway 0ms loops — floor 100ms in `nextDelay`
 
 **Exit criteria**
 
-- [ ] Fake-timer tests green.
-- [ ] README example for countdown/relative label.
+- [x] Fake-timer tests green
+- [x] `npm run typecheck` clean
+- [x] `npm run build` clean (CJS + ESM + DTS)
 
 ---
 

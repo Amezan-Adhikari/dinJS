@@ -24,6 +24,7 @@ __export(src_exports, {
   BS_YEAR_END: () => BS_YEAR_END,
   BS_YEAR_START: () => BS_YEAR_START,
   DinDate: () => DinDate,
+  Duration: () => Duration,
   NEPAL_OFFSET_MS: () => NEPAL_OFFSET_MS,
   NEPAL_TZ: () => NEPAL_TZ,
   TOTAL_DAYS: () => TOTAL_DAYS,
@@ -32,7 +33,8 @@ __export(src_exports, {
   getDaysInBsMonth: () => getDaysInBsMonth,
   getMonthNameEn: () => getMonthNameEn,
   getMonthNameNe: () => getMonthNameNe,
-  isValidBsDate: () => isValidBsDate
+  isValidBsDate: () => isValidBsDate,
+  watchRelative: () => watchRelative
 });
 module.exports = __toCommonJS(src_exports);
 
@@ -383,11 +385,257 @@ function getMonthNameEn(month) {
   return MONTH_NAMES_EN[month - 1];
 }
 
-// src/DinDate.ts
+// src/duration/duration.ts
 var MS_PER_SECOND = 1e3;
 var MS_PER_MINUTE = 60 * MS_PER_SECOND;
 var MS_PER_HOUR = 60 * MS_PER_MINUTE;
 var MS_PER_DAY = 24 * MS_PER_HOUR;
+var Duration = class _Duration {
+  #ms;
+  constructor(ms) {
+    this.#ms = ms;
+  }
+  // ── Source of truth ───────────────────────────────────────────
+  /** Signed total milliseconds. */
+  get milliseconds() {
+    return this.#ms;
+  }
+  // ── Clock breakdown (trunc toward 0) ──────────────────────────
+  /** Whole days (trunc toward 0). */
+  get days() {
+    return Math.trunc(this.#ms / MS_PER_DAY);
+  }
+  /** Whole hours (0–23 after days). */
+  get hours() {
+    const rem = Math.abs(this.#ms) - Math.abs(this.days) * MS_PER_DAY;
+    return Math.trunc(rem / MS_PER_HOUR);
+  }
+  /** Whole minutes (0–59 after hours). */
+  get minutes() {
+    const rem = Math.abs(this.#ms) - Math.abs(this.days) * MS_PER_DAY - Math.abs(this.hours) * MS_PER_HOUR;
+    return Math.trunc(rem / MS_PER_MINUTE);
+  }
+  /** Whole seconds (0–59 after minutes). */
+  get seconds() {
+    const rem = Math.abs(this.#ms) - Math.abs(this.days) * MS_PER_DAY - Math.abs(this.hours) * MS_PER_HOUR - Math.abs(this.minutes) * MS_PER_MINUTE;
+    return Math.trunc(rem / MS_PER_SECOND);
+  }
+  /** Remaining milliseconds (0–999 after seconds). */
+  get millisecondsPart() {
+    const rem = Math.abs(this.#ms) - Math.abs(this.days) * MS_PER_DAY - Math.abs(this.hours) * MS_PER_HOUR - Math.abs(this.minutes) * MS_PER_MINUTE - Math.abs(this.seconds) * MS_PER_SECOND;
+    return rem;
+  }
+  // ── Conversion ────────────────────────────────────────────────
+  /** Convert to any unit. */
+  as(unit) {
+    switch (unit) {
+      case "millisecond":
+        return this.#ms;
+      case "second":
+        return this.#ms / MS_PER_SECOND;
+      case "minute":
+        return this.#ms / MS_PER_MINUTE;
+      case "hour":
+        return this.#ms / MS_PER_HOUR;
+      case "day":
+        return this.#ms / MS_PER_DAY;
+      default:
+        throw new TypeError(`Cannot convert Duration to ${unit} (non-time unit)`);
+    }
+  }
+  // ── Absolute value ────────────────────────────────────────────
+  abs() {
+    return new _Duration(Math.abs(this.#ms));
+  }
+  // ── Negate ────────────────────────────────────────────────────
+  negate() {
+    return new _Duration(-this.#ms);
+  }
+  // ── Add / subtract durations ──────────────────────────────────
+  add(other) {
+    return new _Duration(this.#ms + other.#ms);
+  }
+  subtract(other) {
+    return new _Duration(this.#ms - other.#ms);
+  }
+  // ── Comparison ────────────────────────────────────────────────
+  lt(other) {
+    return this.#ms < other.#ms;
+  }
+  lte(other) {
+    return this.#ms <= other.#ms;
+  }
+  gt(other) {
+    return this.#ms > other.#ms;
+  }
+  gte(other) {
+    return this.#ms >= other.#ms;
+  }
+  eq(other) {
+    return this.#ms === other.#ms;
+  }
+  // ── Humanize ──────────────────────────────────────────────────
+  humanize(locale = "en") {
+    const abs = Math.abs(this.#ms);
+    const sign = this.#ms < 0 ? -1 : this.#ms > 0 ? 1 : 0;
+    if (abs < 45e3) {
+      return locale === "ne" ? "\u0915\u0947\u0939\u0940 \u0938\u0947\u0915\u0923\u094D\u0921" : "a few seconds";
+    }
+    if (abs < 9e4) {
+      return locale === "ne" ? "\u090F\u0915 \u092E\u093F\u0928\u091F" : "a minute";
+    }
+    if (abs < 45 * MS_PER_MINUTE) {
+      const m = Math.round(abs / MS_PER_MINUTE);
+      return locale === "ne" ? `${m} \u092E\u093F\u0928\u091F` : `${m} minutes`;
+    }
+    if (abs < 90 * MS_PER_MINUTE) {
+      return locale === "ne" ? "\u090F\u0915 \u0918\u0923\u094D\u091F\u093E" : "an hour";
+    }
+    if (abs < 22 * MS_PER_HOUR) {
+      const h = Math.round(abs / MS_PER_HOUR);
+      return locale === "ne" ? `${h} \u0918\u0923\u094D\u091F\u093E` : `${h} hours`;
+    }
+    if (abs < 36 * MS_PER_HOUR) {
+      return locale === "ne" ? "\u090F\u0915 \u0926\u093F\u0928" : "a day";
+    }
+    if (abs < 25 * MS_PER_DAY) {
+      const d = Math.round(abs / MS_PER_DAY);
+      return locale === "ne" ? `${d} \u0926\u093F\u0928` : `${d} days`;
+    }
+    if (abs < 31 * MS_PER_DAY) {
+      return locale === "ne" ? "\u090F\u0915 \u092E\u0939\u0940\u0928\u093E" : "a month";
+    }
+    if (abs < 345 * MS_PER_DAY) {
+      const mo = Math.round(abs / (30 * MS_PER_DAY));
+      return locale === "ne" ? `${mo} \u092E\u0939\u0940\u0928\u093E` : `${mo} months`;
+    }
+    if (abs < 545 * MS_PER_DAY) {
+      return locale === "ne" ? "\u090F\u0915 \u0935\u0930\u094D\u0937" : "a year";
+    }
+    const y = Math.round(abs / (365 * MS_PER_DAY));
+    return locale === "ne" ? `${y} \u0935\u0930\u094D\u0937` : `${y} years`;
+  }
+  humanizeAgo(locale = "en") {
+    const h = this.humanize(locale);
+    if (this.#ms === 0) return locale === "ne" ? "\u0905\u092D\u093F" : "just now";
+    if (this.#ms < 0) {
+      return locale === "ne" ? `${h} \u092A\u0939\u093F\u0932\u0947` : `${h} ago`;
+    }
+    return locale === "ne" ? `${h} \u092E\u093E` : `in ${h}`;
+  }
+  // ── Refresh interval ──────────────────────────────────────────
+  /**
+   * Adaptive refresh interval for live-updating UIs.
+   * Returns milliseconds until the next update should fire.
+   */
+  refreshIntervalMs() {
+    return _Duration.refreshForRemaining(Math.abs(this.#ms));
+  }
+  static refreshForRemaining(absMs) {
+    if (absMs < 6e4) return 1e3;
+    if (absMs < 2 * MS_PER_HOUR) return 6e4;
+    if (absMs < 6 * MS_PER_HOUR) return 30 * 6e4;
+    if (absMs < 12 * MS_PER_HOUR) return MS_PER_HOUR;
+    if (absMs < 24 * MS_PER_HOUR) return 2 * MS_PER_HOUR;
+    return MS_PER_DAY;
+  }
+  /**
+   * Compute next delay, capped to the next bucket boundary.
+   */
+  static nextDelay(remainingMs) {
+    const abs = Math.abs(remainingMs);
+    const bucket = _Duration.refreshForRemaining(abs);
+    const boundary = _Duration.msUntilNextBucket(abs);
+    return Math.max(100, Math.min(bucket, boundary));
+  }
+  static msUntilNextBucket(absMs) {
+    if (absMs < 6e4) {
+      return absMs;
+    }
+    if (absMs < 2 * MS_PER_HOUR) {
+      return absMs - 6e4;
+    }
+    if (absMs < 6 * MS_PER_HOUR) {
+      return absMs - 2 * MS_PER_HOUR;
+    }
+    if (absMs < 12 * MS_PER_HOUR) {
+      return absMs - 6 * MS_PER_HOUR;
+    }
+    if (absMs < 24 * MS_PER_HOUR) {
+      return absMs - 12 * MS_PER_HOUR;
+    }
+    return absMs - 24 * MS_PER_HOUR;
+  }
+  // ── Serialization ─────────────────────────────────────────────
+  toJSON() {
+    return {
+      milliseconds: this.#ms,
+      days: this.days,
+      hours: this.hours,
+      minutes: this.minutes,
+      seconds: this.seconds
+    };
+  }
+  toString() {
+    return `Duration(${this.#ms}ms)`;
+  }
+  valueOf() {
+    return this.#ms;
+  }
+  // ── Factory ───────────────────────────────────────────────────
+  static fromMs(ms) {
+    return new _Duration(ms);
+  }
+  static fromSeconds(s) {
+    return new _Duration(s * MS_PER_SECOND);
+  }
+  static fromMinutes(m) {
+    return new _Duration(m * MS_PER_MINUTE);
+  }
+  static fromHours(h) {
+    return new _Duration(h * MS_PER_HOUR);
+  }
+  static fromDays(d) {
+    return new _Duration(d * MS_PER_DAY);
+  }
+};
+
+// src/duration/relative.ts
+function watchRelative(target, callback, options) {
+  const locale = options?.locale ?? "en";
+  let cancelled = false;
+  let timerId;
+  const getBase = () => {
+    if (options?.base) {
+      return typeof options.base === "function" ? options.base() : options.base;
+    }
+    return new target.constructor();
+  };
+  const tick = () => {
+    if (cancelled) return;
+    const now = getBase();
+    const diffMs = target.valueOf() - now.valueOf();
+    const duration = Duration.fromMs(diffMs);
+    const text = duration.humanizeAgo(locale);
+    callback(text, duration);
+    const delay = Duration.nextDelay(diffMs);
+    timerId = setTimeout(tick, delay);
+  };
+  tick();
+  return () => {
+    cancelled = true;
+    if (timerId !== void 0) {
+      clearTimeout(timerId);
+      timerId = void 0;
+    }
+  };
+}
+
+// src/DinDate.ts
+var MS_PER_SECOND2 = 1e3;
+var MS_PER_MINUTE2 = 60 * MS_PER_SECOND2;
+var MS_PER_HOUR2 = 60 * MS_PER_MINUTE2;
+var MS_PER_DAY2 = 24 * MS_PER_HOUR2;
 function isValidBsParts(year, month, day) {
   return isValidBsDate(year, month, day);
 }
@@ -485,7 +733,7 @@ var DinDate = class _DinDate {
   _addUnit(unit, amount) {
     const u = unit.endsWith("s") && unit !== "millisecond" ? unit.slice(0, -1) : unit;
     if (u === "day" || u === "hour" || u === "minute" || u === "second" || u === "millisecond") {
-      const ms = u === "day" ? amount * MS_PER_DAY : u === "hour" ? amount * MS_PER_HOUR : u === "minute" ? amount * MS_PER_MINUTE : u === "second" ? amount * MS_PER_SECOND : amount;
+      const ms = u === "day" ? amount * MS_PER_DAY2 : u === "hour" ? amount * MS_PER_HOUR2 : u === "minute" ? amount * MS_PER_MINUTE2 : u === "second" ? amount * MS_PER_SECOND2 : amount;
       return new _DinDate(this.#utcMs + ms);
     }
     if (u === "month" || u === "year") {
@@ -555,11 +803,11 @@ var DinDate = class _DinDate {
         case "millisecond":
           return msDiff;
         case "second":
-          return Math.trunc(msDiff / MS_PER_SECOND);
+          return Math.trunc(msDiff / MS_PER_SECOND2);
         case "minute":
-          return Math.trunc(msDiff / MS_PER_MINUTE);
+          return Math.trunc(msDiff / MS_PER_MINUTE2);
         case "hour":
-          return Math.trunc(msDiff / MS_PER_HOUR);
+          return Math.trunc(msDiff / MS_PER_HOUR2);
         case "day":
           return this._dayIndex - other._dayIndex;
         case "month": {
@@ -577,14 +825,14 @@ var DinDate = class _DinDate {
     }
     const absMs = Math.abs(msDiff);
     const sign = msDiff < 0 ? -1 : 1;
-    const totalDays = Math.floor(absMs / MS_PER_DAY);
-    const remMs = absMs - totalDays * MS_PER_DAY;
-    const hours = Math.floor(remMs / MS_PER_HOUR);
-    const remAfterHours = remMs - hours * MS_PER_HOUR;
-    const minutes = Math.floor(remAfterHours / MS_PER_MINUTE);
-    const remAfterMinutes = remAfterHours - minutes * MS_PER_MINUTE;
-    const seconds = Math.floor(remAfterMinutes / MS_PER_SECOND);
-    const milliseconds = remAfterMinutes - seconds * MS_PER_SECOND;
+    const totalDays = Math.floor(absMs / MS_PER_DAY2);
+    const remMs = absMs - totalDays * MS_PER_DAY2;
+    const hours = Math.floor(remMs / MS_PER_HOUR2);
+    const remAfterHours = remMs - hours * MS_PER_HOUR2;
+    const minutes = Math.floor(remAfterHours / MS_PER_MINUTE2);
+    const remAfterMinutes = remAfterHours - minutes * MS_PER_MINUTE2;
+    const seconds = Math.floor(remAfterMinutes / MS_PER_SECOND2);
+    const milliseconds = remAfterMinutes - seconds * MS_PER_SECOND2;
     const aBs = this._bsParts;
     const bBs = other._bsParts;
     let yearDiff = aBs.year - bBs.year;
@@ -757,6 +1005,45 @@ var DinDate = class _DinDate {
   // ── Day index (for internal use / advanced) ───────────────────
   dayIndex() {
     return this._dayIndex;
+  }
+  diffNow(unit) {
+    const now = Date.now();
+    const diffMs = this.#utcMs - now;
+    if (unit) {
+      switch (unit) {
+        case "millisecond":
+          return diffMs;
+        case "second":
+          return Math.trunc(diffMs / 1e3);
+        case "minute":
+          return Math.trunc(diffMs / 6e4);
+        case "hour":
+          return Math.trunc(diffMs / 36e5);
+        case "day":
+          return this._dayIndex - nepalDateToDayIndex(
+            ...(() => {
+              const p = utcMsToNepalParts(now);
+              return [p.year, p.month, p.day];
+            })()
+          );
+        default:
+          throw new TypeError(`Cannot use unit "${unit}" with diffNow`);
+      }
+    }
+    return Duration.fromMs(diffMs);
+  }
+  /** Humanized string for time ago / time from now. */
+  fromNow(locale = "en") {
+    return this.diffNow().humanizeAgo(locale);
+  }
+  /** Humanized string from other to this. */
+  from(other, locale = "en") {
+    const diffMs = this.#utcMs - other.#utcMs;
+    return Duration.fromMs(diffMs).humanizeAgo(locale);
+  }
+  /** Watch this date with live-updating relative text. */
+  watchRelative(callback, options) {
+    return watchRelative(this, callback, options);
   }
 };
 
@@ -2374,6 +2661,7 @@ var dinjs_v3 = class {
   BS_YEAR_END,
   BS_YEAR_START,
   DinDate,
+  Duration,
   NEPAL_OFFSET_MS,
   NEPAL_TZ,
   TOTAL_DAYS,
@@ -2382,5 +2670,6 @@ var dinjs_v3 = class {
   getDaysInBsMonth,
   getMonthNameEn,
   getMonthNameNe,
-  isValidBsDate
+  isValidBsDate,
+  watchRelative
 });

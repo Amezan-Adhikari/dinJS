@@ -2,6 +2,8 @@
 export { DinDate } from "./DinDate";
 export type { Unit, CalendarType, DinDateInput, DiffResult } from "./DinDate";
 export { dinjs } from "./dinjs";
+export { Duration } from "./duration/duration";
+export { watchRelative } from "./duration/relative";
 export { NEPAL_OFFSET_MS, NEPAL_TZ } from "./core/time";
 export { getMonthNameNe, getMonthNameEn } from "./core/month-names";
 export { isValidBsDate, getDaysInBsMonth, TOTAL_DAYS } from "./core/day-index";

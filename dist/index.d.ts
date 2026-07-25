@@ -55,6 +55,61 @@ interface BsDateTime extends BsDate {
     ms: number;
 }
 
+declare class Duration {
+    #private;
+    constructor(ms: number);
+    /** Signed total milliseconds. */
+    get milliseconds(): number;
+    /** Whole days (trunc toward 0). */
+    get days(): number;
+    /** Whole hours (0–23 after days). */
+    get hours(): number;
+    /** Whole minutes (0–59 after hours). */
+    get minutes(): number;
+    /** Whole seconds (0–59 after minutes). */
+    get seconds(): number;
+    /** Remaining milliseconds (0–999 after seconds). */
+    get millisecondsPart(): number;
+    /** Convert to any unit. */
+    as(unit: Unit): number;
+    abs(): Duration;
+    negate(): Duration;
+    add(other: Duration): Duration;
+    subtract(other: Duration): Duration;
+    lt(other: Duration): boolean;
+    lte(other: Duration): boolean;
+    gt(other: Duration): boolean;
+    gte(other: Duration): boolean;
+    eq(other: Duration): boolean;
+    humanize(locale?: "en" | "ne"): string;
+    humanizeAgo(locale?: "en" | "ne"): string;
+    /**
+     * Adaptive refresh interval for live-updating UIs.
+     * Returns milliseconds until the next update should fire.
+     */
+    refreshIntervalMs(): number;
+    static refreshForRemaining(absMs: number): number;
+    /**
+     * Compute next delay, capped to the next bucket boundary.
+     */
+    static nextDelay(remainingMs: number): number;
+    private static msUntilNextBucket;
+    toJSON(): {
+        milliseconds: number;
+        days: number;
+        hours: number;
+        minutes: number;
+        seconds: number;
+    };
+    toString(): string;
+    valueOf(): number;
+    static fromMs(ms: number): Duration;
+    static fromSeconds(s: number): Duration;
+    static fromMinutes(m: number): Duration;
+    static fromHours(h: number): Duration;
+    static fromDays(d: number): Duration;
+}
+
 type Unit = "year" | "month" | "day" | "hour" | "minute" | "second" | "millisecond";
 type CalendarType = "bs" | "ad";
 interface DinDateInput {
@@ -120,6 +175,18 @@ declare class DinDate {
     bs(): BsDateTime;
     ad(): NepaliParts;
     dayIndex(): number;
+    /** Duration from now (positive = future, negative = past). */
+    diffNow(): Duration;
+    diffNow(unit: Unit): number;
+    /** Humanized string for time ago / time from now. */
+    fromNow(locale?: "en" | "ne"): string;
+    /** Humanized string from other to this. */
+    from(other: DinDate, locale?: "en" | "ne"): string;
+    /** Watch this date with live-updating relative text. */
+    watchRelative(callback: (text: string, duration: Duration) => void, options?: {
+        base?: DinDate | (() => DinDate);
+        locale?: "en" | "ne";
+    }): () => void;
 }
 
 /**
@@ -138,6 +205,22 @@ declare function dinjs(utcMs: number): DinDate;
 declare function dinjs(input: string, format?: string, options?: {
     bs?: boolean;
 }): DinDate;
+
+/**
+ * Live-updating relative time display.
+ *
+ * Uses chained `setTimeout` (not fixed `setInterval`) with adaptive
+ * `refreshIntervalMs` to avoid unnecessary ticks.
+ *
+ * @param target    The DinDate to watch
+ * @param callback  Called with the humanized text and current Duration
+ * @param options   `{ base, locale }` — base defaults to Date.now()
+ * @returns         Cancel function (must call to avoid timer leaks)
+ */
+declare function watchRelative(target: DinDate, callback: (text: string, duration: Duration) => void, options?: {
+    base?: DinDate | (() => DinDate);
+    locale?: "en" | "ne";
+}): () => void;
 
 /**
  * Map month number (1-based) to Nepali name.
@@ -179,4 +262,4 @@ declare class dinjs_v3 {
     addYears(Years: number): void;
 }
 
-export { BS_YEAR_COUNT, BS_YEAR_END, BS_YEAR_START, type CalendarType, type DateObj, type DiffResult, DinDate, type DinDateInput, NEPAL_OFFSET_MS, NEPAL_TZ, TOTAL_DAYS, type Unit, dinjs, dinjs_v3, getDaysInBsMonth, getMonthNameEn, getMonthNameNe, isValidBsDate };
+export { BS_YEAR_COUNT, BS_YEAR_END, BS_YEAR_START, type CalendarType, type DateObj, type DiffResult, DinDate, type DinDateInput, Duration, NEPAL_OFFSET_MS, NEPAL_TZ, TOTAL_DAYS, type Unit, dinjs, dinjs_v3, getDaysInBsMonth, getMonthNameEn, getMonthNameNe, isValidBsDate, watchRelative };

@@ -3,6 +3,8 @@ import { bsToDayIndex, dayIndexToBs, getDaysInBsMonth, isValidBsDate, BsDate } f
 import { nepalDateToDayIndex, dayIndexToNepalDate, NepaliParts, BsDateTime } from "./core/time";
 import { getMonthNameNe, getMonthNameEn } from "./core/month-names";
 import { BS_YEAR_START, BS_YEAR_COUNT, MONTHS_IN_YEAR, DAYS_IN_MONTH } from "./core/calendar-data";
+import { Duration } from "./duration/duration";
+import { watchRelative as _watchRelative } from "./duration/relative";
 
 // ── Types ───────────────────────────────────────────────────────
 
@@ -522,5 +524,50 @@ export class DinDate {
 
   dayIndex(): number {
     return this._dayIndex;
+  }
+
+  // ── Relative time ─────────────────────────────────────────────
+
+  /** Duration from now (positive = future, negative = past). */
+  diffNow(): Duration;
+  diffNow(unit: Unit): number;
+  diffNow(unit?: Unit): Duration | number {
+    const now = Date.now();
+    const diffMs = this.#utcMs - now;
+    if (unit) {
+      switch (unit) {
+        case "millisecond": return diffMs;
+        case "second": return Math.trunc(diffMs / 1000);
+        case "minute": return Math.trunc(diffMs / 60000);
+        case "hour": return Math.trunc(diffMs / 3600000);
+        case "day": return this._dayIndex - nepalDateToDayIndex(
+          ...(() => {
+            const p = utcMsToNepalParts(now);
+            return [p.year, p.month, p.day] as const;
+          })()
+        );
+        default: throw new TypeError(`Cannot use unit "${unit}" with diffNow`);
+      }
+    }
+    return Duration.fromMs(diffMs);
+  }
+
+  /** Humanized string for time ago / time from now. */
+  fromNow(locale: "en" | "ne" = "en"): string {
+    return this.diffNow().humanizeAgo(locale);
+  }
+
+  /** Humanized string from other to this. */
+  from(other: DinDate, locale: "en" | "ne" = "en"): string {
+    const diffMs = this.#utcMs - other.#utcMs;
+    return Duration.fromMs(diffMs).humanizeAgo(locale);
+  }
+
+  /** Watch this date with live-updating relative text. */
+  watchRelative(
+    callback: (text: string, duration: Duration) => void,
+    options?: { base?: DinDate | (() => DinDate); locale?: "en" | "ne" }
+  ): () => void {
+    return _watchRelative(this, callback, options);
   }
 }
